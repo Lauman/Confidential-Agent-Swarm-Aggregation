@@ -1,0 +1,17 @@
+{
+  "name": "private-signal-swarm",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Confidential Agent Swarm Aggregation - ETHGlobal ETHOnline 2026",
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm -r --parallel dev",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}

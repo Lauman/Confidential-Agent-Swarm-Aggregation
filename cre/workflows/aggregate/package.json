@@ -1,0 +1,24 @@
+{
+  "name": "@private-signal-swarm/cre-workflow",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "node --watch --loader ts-node/esm src/workflow.ts",
+    "start": "node dist/workflow.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "rm -rf dist",
+    "simulate": "cre workflow simulate"
+  },
+  "dependencies": {
+    "@private-signal-swarm/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  }
+}
