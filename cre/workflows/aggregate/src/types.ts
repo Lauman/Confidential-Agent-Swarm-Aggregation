@@ -1,11 +1,1 @@
-export interface WorkflowInput {
-  values: number[];
-  roundId: string;
-}
-
-export interface WorkflowOutput {
-  aggregate: number;
-  roundId: string;
-  participantCount: number;
-  timestamp: number;
-}
+export type { AggregationRequest, AggregationResult } from '@private-signal-swarm/types';

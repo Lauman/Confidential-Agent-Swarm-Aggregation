@@ -1,8 +1,31 @@
-// x402 middleware placeholder
-// Will integrate with x402-express and Hedera Blocky402 facilitator
+import { paymentMiddleware, Network } from 'x402-express';
+import type { RequestHandler } from 'express';
 
-export const x402Middleware = (req: any, res: any, next: any) => {
-  // TODO: Implement x402 payment verification
-  // For now, pass through without payment requirement
-  next();
-};
+export interface X402Config {
+  payTo: string;
+  price: string;
+  network: Network;
+  facilitatorUrl?: string;
+}
+
+export function createX402Middleware(config: X402Config): RequestHandler {
+  const routes = {
+    '/api/signal': {
+      price: config.price,
+      network: config.network,
+      config: {
+        description: 'Access to aggregate swarm signal'
+      }
+    }
+  };
+
+  const facilitator = config.facilitatorUrl
+    ? { url: config.facilitatorUrl as `${string}://${string}` }
+    : undefined;
+
+  return paymentMiddleware(
+    config.payTo as `0x${string}`,
+    routes,
+    facilitator
+  ) as RequestHandler;
+}

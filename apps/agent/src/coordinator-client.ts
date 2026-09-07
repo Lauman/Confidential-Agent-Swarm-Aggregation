@@ -7,11 +7,18 @@ export class CoordinatorClient {
     this.endpoint = endpoint;
   }
 
-  async submit(submission: AgentSubmission): Promise<void> {
-    // TODO: Implement actual HTTP POST to coordinator
-    console.log(`Submitting to coordinator at ${this.endpoint}:`, submission);
+  async getCurrentRoundId(): Promise<string> {
+    const response = await fetch(`${this.endpoint}/round/current`);
     
-    // Placeholder implementation
+    if (!response.ok) {
+      throw new Error(`Failed to get current round: ${response.statusText}`);
+    }
+
+    const data = await response.json() as { roundId: string };
+    return data.roundId;
+  }
+
+  async submit(submission: AgentSubmission): Promise<void> {
     const response = await fetch(`${this.endpoint}/submit`, {
       method: 'POST',
       headers: {

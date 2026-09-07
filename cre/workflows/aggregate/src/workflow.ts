@@ -1,17 +1,17 @@
 import { handler } from './handler.js';
-import { WorkflowInput } from './types.js';
+import { AggregationRequest } from './types.js';
 
-// CRE workflow entry point
-export async function workflow(input: WorkflowInput) {
-  // The handler runs inside the TEE
-  // Individual values are private, only aggregate leaves
+export async function workflow(input: AggregationRequest) {
   return handler(input);
 }
 
-// For local testing
 if (process.env.NODE_ENV === 'development') {
-  const testInput: WorkflowInput = {
-    values: [102.3, 98.7, 105.1],
+  const testInput: AggregationRequest = {
+    submissions: [
+      { agentId: 'agent-1', roundId: 'test-round-001', value: 102.3, timestamp: Date.now() },
+      { agentId: 'agent-2', roundId: 'test-round-001', value: 98.7, timestamp: Date.now() },
+      { agentId: 'agent-3', roundId: 'test-round-001', value: 105.1, timestamp: Date.now() }
+    ],
     roundId: 'test-round-001'
   };
   

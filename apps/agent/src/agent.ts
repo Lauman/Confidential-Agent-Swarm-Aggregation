@@ -1,7 +1,11 @@
 import { AgentConfig } from '@private-signal-swarm/types';
+import { Console } from 'node:console';
+import { stderr, stdout } from 'node:process';
 import { Estimator } from './estimator.js';
 import { MockDataSource } from './data-source.js';
 import { CoordinatorClient } from './coordinator-client.js';
+
+const logger = new Console(stdout, stderr);
 
 export class Agent {
   private estimator: Estimator;
@@ -17,16 +21,16 @@ export class Agent {
   }
 
   async run(): Promise<void> {
-    console.log(`Agent ${this.config.id} starting...`);
-    
+    logger.log(`Agent ${this.config.id} starting...`);
+
     const rawData = await this.dataSource.fetchData();
     const privateValue = this.estimate(rawData);
-    
-    console.log(`Agent ${this.config.id} computed private value: ${privateValue}`);
-    
+
+    logger.log(`Agent ${this.config.id} computed private value: ${privateValue}`);
+
     await this.submitToCoordinator(privateValue);
-    
-    console.log(`Agent ${this.config.id} submitted value to coordinator`);
+
+    logger.log(`Agent ${this.config.id} submitted value to coordinator`);
   }
 
   private estimate(data: unknown): number {
@@ -34,7 +38,7 @@ export class Agent {
   }
 
   private async submitToCoordinator(value: number): Promise<void> {
-    const roundId = `round-${Date.now()}`;
+    const roundId = await this.coordinatorClient.getCurrentRoundId();
     await this.coordinatorClient.submit({
       agentId: this.config.id,
       roundId,
