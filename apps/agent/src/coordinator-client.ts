@@ -1,4 +1,5 @@
 import { AgentSubmission } from '@private-signal-swarm/types';
+import fetch from 'node-fetch';
 
 export class CoordinatorClient {
   private endpoint: string;
