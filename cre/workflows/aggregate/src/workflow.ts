@@ -15,7 +15,5 @@ if (process.env.NODE_ENV === 'development') {
     roundId: 'test-round-001'
   };
   
-  console.log('Testing workflow with:', testInput);
-  const result = workflow(testInput);
-  console.log('Result:', result);
+  void workflow(testInput);
 }
