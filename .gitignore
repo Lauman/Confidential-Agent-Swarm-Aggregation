@@ -48,4 +48,4 @@ temp/
 # Package manager
 .pnpm-debug.log
 
-docs/*
+.internal/*
