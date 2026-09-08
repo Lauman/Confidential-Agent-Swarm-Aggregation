@@ -1,8 +1,15 @@
 import { Router, Router as ExpressRouter } from 'express';
 import { RoundManager } from './round-manager.js';
+import { CREAggregator, MockAggregator } from './aggregator.js';
+import { config } from './config.js';
 
 export const coordinatorRouter: ExpressRouter = Router();
-const roundManager = new RoundManager();
+
+const aggregator = config.creEndpoint
+  ? new CREAggregator(config.creEndpoint)
+  : new MockAggregator();
+
+const roundManager = new RoundManager(config.quorum, aggregator);
 
 coordinatorRouter.get('/round/current', (_req, res) => {
   res.json({ roundId: roundManager.getCurrentRoundId() });

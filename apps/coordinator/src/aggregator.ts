@@ -26,7 +26,7 @@ export class CREAggregator implements ConfidentialAggregator {
   }
 
   async aggregate(request: AggregationRequest): Promise<AggregationResult> {
-    const response = await fetch(`${this.creEndpoint}/aggregate`, {
+    const response = await fetch(this.creEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(request)
@@ -36,6 +36,7 @@ export class CREAggregator implements ConfidentialAggregator {
       throw new Error(`CRE aggregation failed: ${response.statusText}`);
     }
 
-    return response.json() as Promise<AggregationResult>;
+    const text = await response.text();
+    return JSON.parse(text) as AggregationResult;
   }
 }

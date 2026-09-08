@@ -1,1 +1,5 @@
-export type { AggregationRequest, AggregationResult } from '@private-signal-swarm/types';
+export type {
+  AgentSubmission,
+  AggregationRequest,
+  AggregationResult,
+} from "./handler.js";

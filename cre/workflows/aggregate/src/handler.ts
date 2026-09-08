@@ -1,19 +1,37 @@
-import { AggregationRequest, AggregationResult } from '@private-signal-swarm/types';
+export interface AgentSubmission {
+  agentId: string;
+  roundId: string;
+  value: number;
+  signature?: string;
+  timestamp: number;
+}
 
-export function handler(input: AggregationRequest): AggregationResult {
+export interface AggregationRequest {
+  roundId: string;
+  submissions: AgentSubmission[];
+}
+
+export interface AggregationResult {
+  roundId: string;
+  aggregate: number;
+  participantCount: number;
+  timestamp: number;
+}
+
+export function aggregate(input: AggregationRequest): AggregationResult {
   const { submissions, roundId } = input;
-  
+
   if (submissions.length === 0) {
-    throw new Error('No values provided for aggregation');
+    throw new Error("No values provided for aggregation");
   }
 
-  const values = submissions.map(s => s.value);
+  const values = submissions.map((s) => s.value);
   const aggregate = values.reduce((a, b) => a + b, 0) / values.length;
-  
+
   return {
     aggregate,
     roundId,
     participantCount: values.length,
-    timestamp: Date.now()
+    timestamp: Date.now(),
   };
 }

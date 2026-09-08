@@ -1,19 +1,70 @@
-import { handler } from './handler.js';
-import { AggregationRequest } from './types.js';
+import {
+  HTTPCapability,
+  handlerInTee,
+  Runner,
+  type HTTPPayload,
+  type TeeRuntime,
+} from "@chainlink/cre-sdk";
+import { z } from "zod";
+import { aggregate, type AggregationRequest, type AggregationResult } from "./handler.js";
 
-export async function workflow(input: AggregationRequest) {
-  return handler(input);
+const configSchema = z.object({
+  authorizedKey: z.string().optional(),
+});
+
+type Config = z.infer<typeof configSchema>;
+
+const onHttpTrigger = (
+  runtime: TeeRuntime<Config>,
+  payload: HTTPPayload
+): string => {
+  if (!payload.input || payload.input.length === 0) {
+    throw new Error("Empty aggregation request");
+  }
+
+  const request: AggregationRequest = JSON.parse(
+    payload.input.toString()
+  );
+
+  runtime.log(
+    `Processing ${request.submissions.length} submissions for round ${request.roundId}`
+  );
+
+  const result: AggregationResult = aggregate(request);
+
+  runtime.log(
+    `Confidential aggregation complete. roundId=${result.roundId} aggregate=${result.aggregate} participants=${result.participantCount}`
+  );
+
+  return JSON.stringify(result);
+};
+
+const initWorkflow = (config: Config) => {
+  const http = new HTTPCapability();
+
+  const triggerConfig = config.authorizedKey
+    ? {
+        authorizedKeys: [
+          {
+            type: "KEY_TYPE_ECDSA_EVM" as const,
+            publicKey: config.authorizedKey,
+          },
+        ],
+      }
+    : {};
+
+  return [
+    handlerInTee(
+      http.trigger(triggerConfig),
+      onHttpTrigger,
+      [{ tee: "nitro", regions: ["us-west-2"] }]
+    ),
+  ];
+};
+
+export async function main() {
+  const runner = await Runner.newRunner<Config>({ configSchema });
+  await runner.run(initWorkflow);
 }
 
-if (process.env.NODE_ENV === 'development') {
-  const testInput: AggregationRequest = {
-    submissions: [
-      { agentId: 'agent-1', roundId: 'test-round-001', value: 102.3, timestamp: Date.now() },
-      { agentId: 'agent-2', roundId: 'test-round-001', value: 98.7, timestamp: Date.now() },
-      { agentId: 'agent-3', roundId: 'test-round-001', value: 105.1, timestamp: Date.now() }
-    ],
-    roundId: 'test-round-001'
-  };
-  
-  void workflow(testInput);
-}
+await main();
