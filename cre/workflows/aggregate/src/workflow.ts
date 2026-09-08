@@ -1,50 +1,60 @@
 import {
-  CronCapability,
+  decodeJson,
   handlerInTee,
+  HTTPCapability,
   Runner,
+  type HTTPPayload,
   type TeeRuntime,
 } from "@chainlink/cre-sdk";
 import { z } from "zod";
 import { aggregate, type AggregationRequest, type AggregationResult } from "./handler.js";
 
+const submissionSchema = z.object({
+  agentId: z.string(),
+  roundId: z.string(),
+  value: z.number(),
+  signature: z.string().optional(),
+  timestamp: z.number(),
+});
+
+const requestSchema = z.object({
+  roundId: z.string(),
+  submissions: z.array(submissionSchema).min(1),
+});
+
 const configSchema = z.object({
-  schedule: z.string(),
+  coordinatorAddress: z.string().optional(),
 });
 
 type Config = z.infer<typeof configSchema>;
 
-const onCronTrigger = (runtime: TeeRuntime<Config>): string => {
-  runtime.log("Confidential aggregation workflow triggered");
+const onHttpTrigger = (runtime: TeeRuntime<Config>, payload: HTTPPayload): string => {
+  if (!payload.input || payload.input.length === 0) {
+    throw new Error("Empty aggregation request");
+  }
 
-  const secret = runtime.getSecret({ id: "COORDINATOR_AUTH_KEY" }).result();
-  runtime.log(`Coordinator auth key retrieved (length=${secret.value.length})`);
+  const request = requestSchema.parse(decodeJson(payload.input)) as AggregationRequest;
 
-  const sampleRequest: AggregationRequest = {
-    roundId: "simulation-round-001",
-    submissions: [
-      { agentId: "agent-1", roundId: "simulation-round-001", value: 102.3, timestamp: Date.now() },
-      { agentId: "agent-2", roundId: "simulation-round-001", value: 98.7, timestamp: Date.now() },
-      { agentId: "agent-3", roundId: "simulation-round-001", value: 105.1, timestamp: Date.now() },
-    ],
-  };
+  runtime.getSecret({ id: "COORDINATOR_AUTH_KEY" }).result();
 
-  const result: AggregationResult = aggregate(sampleRequest);
+  const result: AggregationResult = aggregate(request);
 
   runtime.log(
-    `Confidential aggregation complete. roundId=${result.roundId} aggregate=${result.aggregate} participants=${result.participantCount}`
+    `Confidential aggregation complete. roundId=${result.roundId} participants=${result.participantCount}`
   );
 
   return JSON.stringify(result);
 };
 
 const initWorkflow = (config: Config) => {
-  const cron = new CronCapability();
+  const http = new HTTPCapability();
+  const authorizedKeys = config.coordinatorAddress
+    ? [{ type: "KEY_TYPE_ECDSA_EVM" as const, publicKey: config.coordinatorAddress }]
+    : [];
   return [
-    handlerInTee(
-      cron.trigger({ schedule: config.schedule }),
-      onCronTrigger,
-      {}
-    ),
+    handlerInTee(http.trigger({ authorizedKeys }), onHttpTrigger, [
+      { tee: "nitro", regions: ["us-west-2"] },
+    ]),
   ];
 };
 

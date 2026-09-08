@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "clean": "rm -rf dist",
-    "simulate": "cre workflow simulate aggregate --target staging-settings --non-interactive --trigger-index 0"
+    "simulate": "cre workflow simulate ./ --target staging-settings --non-interactive --trigger-index 0 --http-payload test-payload.json"
   },
   "dependencies": {
     "@chainlink/cre-sdk": "^1.19.0",

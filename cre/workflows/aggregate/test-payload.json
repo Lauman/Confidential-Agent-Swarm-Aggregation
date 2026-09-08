@@ -1,0 +1,8 @@
+{
+  "roundId": "simulation-round-001",
+  "submissions": [
+    { "agentId": "agent-1", "roundId": "simulation-round-001", "value": 102.3, "timestamp": 1788876833080 },
+    { "agentId": "agent-2", "roundId": "simulation-round-001", "value": 98.7, "timestamp": 1788876833080 },
+    { "agentId": "agent-3", "roundId": "simulation-round-001", "value": 105.1, "timestamp": 1788876833080 }
+  ]
+}
