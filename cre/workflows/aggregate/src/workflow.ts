@@ -1,36 +1,34 @@
 import {
-  HTTPCapability,
+  CronCapability,
   handlerInTee,
   Runner,
-  type HTTPPayload,
   type TeeRuntime,
 } from "@chainlink/cre-sdk";
 import { z } from "zod";
 import { aggregate, type AggregationRequest, type AggregationResult } from "./handler.js";
 
 const configSchema = z.object({
-  authorizedKey: z.string().optional(),
+  schedule: z.string(),
 });
 
 type Config = z.infer<typeof configSchema>;
 
-const onHttpTrigger = (
-  runtime: TeeRuntime<Config>,
-  payload: HTTPPayload
-): string => {
-  if (!payload.input || payload.input.length === 0) {
-    throw new Error("Empty aggregation request");
-  }
+const onCronTrigger = (runtime: TeeRuntime<Config>): string => {
+  runtime.log("Confidential aggregation workflow triggered");
 
-  const request: AggregationRequest = JSON.parse(
-    payload.input.toString()
-  );
+  const secret = runtime.getSecret({ id: "COORDINATOR_AUTH_KEY" }).result();
+  runtime.log(`Coordinator auth key retrieved (length=${secret.value.length})`);
 
-  runtime.log(
-    `Processing ${request.submissions.length} submissions for round ${request.roundId}`
-  );
+  const sampleRequest: AggregationRequest = {
+    roundId: "simulation-round-001",
+    submissions: [
+      { agentId: "agent-1", roundId: "simulation-round-001", value: 102.3, timestamp: Date.now() },
+      { agentId: "agent-2", roundId: "simulation-round-001", value: 98.7, timestamp: Date.now() },
+      { agentId: "agent-3", roundId: "simulation-round-001", value: 105.1, timestamp: Date.now() },
+    ],
+  };
 
-  const result: AggregationResult = aggregate(request);
+  const result: AggregationResult = aggregate(sampleRequest);
 
   runtime.log(
     `Confidential aggregation complete. roundId=${result.roundId} aggregate=${result.aggregate} participants=${result.participantCount}`
@@ -40,24 +38,12 @@ const onHttpTrigger = (
 };
 
 const initWorkflow = (config: Config) => {
-  const http = new HTTPCapability();
-
-  const triggerConfig = config.authorizedKey
-    ? {
-        authorizedKeys: [
-          {
-            type: "KEY_TYPE_ECDSA_EVM" as const,
-            publicKey: config.authorizedKey,
-          },
-        ],
-      }
-    : {};
-
+  const cron = new CronCapability();
   return [
     handlerInTee(
-      http.trigger(triggerConfig),
-      onHttpTrigger,
-      [{ tee: "nitro", regions: ["us-west-2"] }]
+      cron.trigger({ schedule: config.schedule }),
+      onCronTrigger,
+      {}
     ),
   ];
 };
