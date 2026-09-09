@@ -31,7 +31,7 @@ export class LocalTeeRunner implements TeeSeam {
   }
 
   async process(batch: BatchHandoff, keyId: string): Promise<TeeSignedResult> {
-    if (batch.envelopes.some((e) => e.keyId !== this.secrets.keyId || e.keyId !== keyId)) {
+    if (keyId !== this.secrets.keyId) {
       throw new TeeSeamError('Batch keyId does not match TEE secrets');
     }
     return processBatch(

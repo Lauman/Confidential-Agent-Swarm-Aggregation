@@ -19,9 +19,7 @@
   "devDependencies": {
     "vitest": "^1.0.0"
   },
-  "dependencies": {
-    "libsodium-wrappers-sumo": "^0.8.4"
-  },
+  "dependencies": {},
   "workspaces": [
     "apps/*",
     "packages/*",

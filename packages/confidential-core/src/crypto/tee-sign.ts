@@ -23,7 +23,9 @@ export function teeResultCanonical(result: TeeResultSigningInput): Uint8Array {
 }
 
 export function teeSignResult(privB64: string, result: TeeResultSigningInput): string {
-  const privKey = fromB64(privB64);
+  const fullPrivKey = fromB64(privB64);
+  // libsodium returns 64-byte secret key (seed + public key), noble/curves expects 32-byte seed
+  const privKey = fullPrivKey.length === 64 ? fullPrivKey.slice(0, 32) : fullPrivKey;
   const msg = teeResultCanonical(result);
   const sig = ed25519.sign(msg, privKey);
   return toB64(sig);
