@@ -31,8 +31,10 @@ async function main() {
   const nodeModulesBin = path.join(workflowDir, 'node_modules', '.bin');
 
   const localBin = path.join(process.env.HOME ?? '', '.local', 'bin');
-  // Use simple-settings target (no external dependencies)
-  // To use confidential mode, change target to 'staging-settings'
+  // Use simple-settings target for testing (no external dependencies)
+  // Other targets:
+  //   - 'staging-settings': Main workflow with confidential features (needs beta access)
+  //   - 'plain-settings': Non-confidential version (HTTPCapability WASM issues)
   const target = 'simple-settings';
 
   // Generate a random ETH private key for simulation if not provided
