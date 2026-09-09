@@ -1,2 +1,10 @@
+# CRE environment
 .env
 *.env
+
+# Build artifacts
+*.cre_build_tmp.js
+node_modules/
+
+# CRE state
+state/
