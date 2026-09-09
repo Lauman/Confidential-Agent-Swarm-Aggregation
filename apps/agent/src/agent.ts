@@ -1,49 +1,59 @@
-import { AgentConfig } from '@private-signal-swarm/types';
-import { Console } from 'node:console';
-import { stderr, stdout } from 'node:process';
-import { Estimator } from './estimator.js';
-import { MockDataSource } from './data-source.js';
-import { CoordinatorClient } from './coordinator-client.js';
+import type { AgentConfig } from '@private-signal-swarm/types';
+import { CoordinatorClient, CoordinatorClientError } from './coordinator-client.js';
+import { EnvelopeFactory, loadAgentPrivateKey } from './crypto.js';
+import { DELIBERATION_USE_CASE, deliberateMock } from './payload/deliberation.js';
 
-const logger = new Console(stdout, stderr);
+export interface AgentRunResult {
+  status: 'submitted' | 'quorum-reached' | 'skipped';
+  result?: unknown;
+}
 
 export class Agent {
-  private estimator: Estimator;
-  private dataSource: MockDataSource;
-  private coordinatorClient: CoordinatorClient;
-  private config: AgentConfig;
+  private readonly config: AgentConfig;
+  private readonly envelopes: EnvelopeFactory;
+  private readonly coordinator: CoordinatorClient;
 
   constructor(config: AgentConfig) {
+    if (!config.keymapPath) {
+      throw new Error('Agent requires a keymap path');
+    }
     this.config = config;
-    this.estimator = new Estimator();
-    this.dataSource = new MockDataSource();
-    this.coordinatorClient = new CoordinatorClient(config.coordinatorEndpoint);
+    this.envelopes = new EnvelopeFactory(
+      config.keymapPath,
+      config.id,
+      loadAgentPrivateKey(config, config.keymapPath)
+    );
+    this.coordinator = new CoordinatorClient(config.coordinatorEndpoint);
   }
 
-  async run(): Promise<void> {
-    logger.log(`Agent ${this.config.id} starting...`);
+  async run(proposalRef: string): Promise<AgentRunResult> {
+    const ballot = deliberateMock(this.config.id, proposalRef);
 
-    const rawData = await this.dataSource.fetchData();
-    const privateValue = this.estimate(rawData);
+    let roundId: string;
+    try {
+      roundId = await this.coordinator.getCurrentRoundId(DELIBERATION_USE_CASE);
+    } catch (error) {
+      throw new Error(`Agent ${this.config.id} could not get current round: ${(error as Error).message}`);
+    }
 
-    logger.log(`Agent ${this.config.id} computed private value: ${privateValue}`);
+    const envelope = await this.envelopes.createEnvelope(roundId, DELIBERATION_USE_CASE, ballot);
 
-    await this.submitToCoordinator(privateValue);
+    let outcome;
+    try {
+      outcome = await this.coordinator.submit(envelope);
+    } catch (error) {
+      if (error instanceof CoordinatorClientError && error.code === 'unknown-key') {
+        this.envelopes.reloadKeymap();
+        const retry = await this.envelopes.createEnvelope(roundId, DELIBERATION_USE_CASE, ballot);
+        outcome = await this.coordinator.submit(retry);
+      } else {
+        throw error;
+      }
+    }
 
-    logger.log(`Agent ${this.config.id} submitted value to coordinator`);
-  }
-
-  private estimate(data: unknown): number {
-    return this.estimator.compute(data);
-  }
-
-  private async submitToCoordinator(value: number): Promise<void> {
-    const roundId = await this.coordinatorClient.getCurrentRoundId();
-    await this.coordinatorClient.submit({
-      agentId: this.config.id,
-      roundId,
-      value,
-      timestamp: Date.now()
-    });
+    if (outcome.status === 'quorum-reached') {
+      return { status: 'quorum-reached', result: outcome.result };
+    }
+    return { status: 'submitted' };
   }
 }

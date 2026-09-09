@@ -5,15 +5,15 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "dev": "node --watch --loader ts-node/esm src/agent.ts",
-    "start": "node dist/agent.js",
+    "dev": "node --watch --loader ts-node/esm src/main.ts",
+    "start": "node dist/main.js",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@private-signal-swarm/types": "workspace:*",
-    "node-fetch": "^3.3.0"
+    "@private-signal-swarm/confidential-core": "workspace:*",
+    "@private-signal-swarm/types": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

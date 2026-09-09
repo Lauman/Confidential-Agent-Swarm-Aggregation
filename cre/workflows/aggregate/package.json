@@ -5,14 +5,18 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
+    "dev": "node --watch --loader ts-node/esm src/workflow.ts",
     "start": "node dist/workflow.js",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "clean": "rm -rf dist",
-    "simulate": "cd ../.. && SECRET_COORDINATOR_AUTH_KEY=dummy $HOME/.cre/bin/cre workflow simulate workflows/aggregate --target staging-settings --non-interactive --trigger-index 0 --http-payload workflows/aggregate/test-payload.json"
+    "generate:payload": "node --loader ts-node/esm scripts/generate-simulate-payload.ts",
+    "simulate": "node --loader ts-node/esm scripts/run-simulate.ts"
   },
   "dependencies": {
     "@chainlink/cre-sdk": "^1.19.0",
+    "@private-signal-swarm/confidential-core": "workspace:*",
+    "@private-signal-swarm/types": "workspace:*",
     "zod": "^3.23.0"
   },
   "devDependencies": {

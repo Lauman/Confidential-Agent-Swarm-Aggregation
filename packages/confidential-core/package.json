@@ -1,0 +1,33 @@
+{
+  "name": "@private-signal-swarm/confidential-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "keygen": "node --loader ts-node/esm scripts/keygen.ts",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@private-signal-swarm/types": "workspace:*",
+    "libsodium-wrappers": "0.7.14",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  }
+}

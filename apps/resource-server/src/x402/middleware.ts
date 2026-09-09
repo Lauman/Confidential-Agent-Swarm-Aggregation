@@ -10,13 +10,13 @@ export interface X402Config {
 
 export function createX402Middleware(config: X402Config): RequestHandler {
   const routes = {
-    '/api/signal': {
+    '/api/verdict': {
       price: config.price,
       network: config.network,
       config: {
-        description: 'Access to aggregate swarm signal'
-      }
-    }
+        description: 'Access to the signed swarm verdict',
+      },
+    },
   };
 
   const facilitator = config.facilitatorUrl

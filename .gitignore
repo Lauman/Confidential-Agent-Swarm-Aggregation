@@ -37,6 +37,9 @@ yarn-error.log*
 coverage/
 .nyc_output/
 
+# Dev crypto material (TEE + agent private keys — never commit)
+.dev-keys/
+
 # CRE
 cre/workflows/*/dist/
 
