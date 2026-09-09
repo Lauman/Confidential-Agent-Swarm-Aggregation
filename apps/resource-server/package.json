@@ -9,13 +9,21 @@
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist dist-scripts",
+    "build:scripts": "tsc --project tsconfig.scripts.json",
+    "pay:verdict": "pnpm build:scripts && node dist-scripts/pay-for-verdict.js",
+    "associate:token": "pnpm build:scripts && node dist-scripts/associate-token.js",
+    "debug:pay-build": "pnpm build:scripts && node dist-scripts/debug-payment-build.js",
+    "check:hedera": "pnpm build:scripts && node dist-scripts/check-hedera-key.js"
   },
   "dependencies": {
     "@private-signal-swarm/confidential-core": "workspace:*",
     "@private-signal-swarm/types": "workspace:*",
+    "@x402/core": "2.25.0",
+    "@x402/express": "2.25.0",
+    "@x402/fetch": "2.25.0",
+    "@x402/hedera": "2.25.0",
     "express": "^4.18.0",
-    "x402-express": "^1.0.0",
     "zod": "^3.23.0"
   },
   "devDependencies": {
