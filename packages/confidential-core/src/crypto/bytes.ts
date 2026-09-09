@@ -1,6 +1,12 @@
 import { randomBytes as nobleRandomBytes } from '@noble/ciphers/utils.js';
+import sodium from 'libsodium-wrappers';
 
 export type Bytes = Uint8Array;
+
+export async function ready(): Promise<typeof sodium> {
+  await sodium.ready;
+  return sodium;
+}
 
 export function toB64(bytes: Bytes): string {
   return Buffer.from(bytes).toString('base64');

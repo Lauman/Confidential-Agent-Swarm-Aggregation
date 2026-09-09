@@ -1,12 +1,15 @@
 import * as path from 'node:path';
+import * as url from 'node:url';
 import * as os from 'node:os';
 import { SUPPORTED_USE_CASES } from '@private-signal-swarm/confidential-core';
 
+const WORKSPACE_ROOT = path.resolve(path.dirname(url.fileURLToPath(import.meta.url)), '..', '..', '..');
+
 function resolveFromRoot(p: string | undefined, fallback: string): string {
   if (!p) {
-    return path.resolve(process.cwd(), fallback);
+    return path.join(WORKSPACE_ROOT, fallback);
   }
-  return path.isAbsolute(p) ? p : path.resolve(process.cwd(), p);
+  return path.isAbsolute(p) ? p : path.resolve(WORKSPACE_ROOT, p);
 }
 
 export const config = {
@@ -24,7 +27,7 @@ export const config = {
     path.join('packages/confidential-core/.dev-keys/dev-secrets.json')
   ),
   stateDir: process.env.STATE_DIR
-    ? path.resolve(process.cwd(), process.env.STATE_DIR)
+    ? path.isAbsolute(process.env.STATE_DIR) ? process.env.STATE_DIR : path.resolve(WORKSPACE_ROOT, process.env.STATE_DIR)
     : path.join(os.tmpdir(), 'private-signal-swarm-coordinator'),
   resultIngestUrl: process.env.RESULT_INGEST_URL || undefined,
 };

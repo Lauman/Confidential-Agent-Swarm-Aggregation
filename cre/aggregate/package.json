@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "dev": "node --watch --loader ts-node/esm src/workflow.ts",
+    "dev": "tsc --watch",
     "start": "node dist/workflow.js",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

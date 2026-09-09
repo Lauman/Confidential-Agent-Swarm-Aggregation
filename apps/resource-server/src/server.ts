@@ -1,11 +1,14 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import * as url from 'node:url';
 import express, { type Express, type NextFunction, type Request, type Response } from 'express';
 import { verdictRouter, bindResultStore } from './routes/verdict.js';
 import { createX402Middleware } from './x402/middleware.js';
 import { VerifiedResultStore } from './result-store.js';
 import type { KeymapFile } from '@private-signal-swarm/confidential-core';
 import type { Network } from 'x402-express';
+
+const WORKSPACE_ROOT = path.resolve(path.dirname(url.fileURLToPath(import.meta.url)), '..', '..', '..');
 
 export interface ResourceServer {
   app: Express;
@@ -14,8 +17,8 @@ export interface ResourceServer {
 
 export function createApp(): ResourceServer {
   const keymapPath = process.env.KEYMAP_PATH
-    ? path.resolve(process.cwd(), process.env.KEYMAP_PATH)
-    : path.resolve(process.cwd(), 'packages/confidential-core/.dev-keys/keymap.json');
+    ? path.isAbsolute(process.env.KEYMAP_PATH) ? process.env.KEYMAP_PATH : path.resolve(WORKSPACE_ROOT, process.env.KEYMAP_PATH)
+    : path.join(WORKSPACE_ROOT, 'packages/confidential-core/.dev-keys/keymap.json');
 
   let keymap: KeymapFile;
   try {
