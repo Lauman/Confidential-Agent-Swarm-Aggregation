@@ -55,9 +55,9 @@ const onHttpTrigger = async (
 
   // For non-confidential mode, secrets come from environment variables
   const secrets: ProcessBatchSecrets = {
-    teeEncPub: process.env.TEE_ENC_PUB ?? '',
-    teeEncPriv: process.env.TEE_ENC_PRIV ?? '',
-    teeSignPriv: process.env.TEE_SIGN_PRIV ?? '',
+    teeEncPub: process.env.CRE_TEE_ENC_PUB ?? '',
+    teeEncPriv: process.env.CRE_TEE_ENC_PRIV ?? '',
+    teeSignPriv: process.env.CRE_TEE_SIGN_PRIV ?? '',
   };
 
   if (!secrets.teeEncPub || !secrets.teeEncPriv || !secrets.teeSignPriv) {

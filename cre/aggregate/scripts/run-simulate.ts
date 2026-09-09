@@ -1,12 +1,18 @@
 import { spawnSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { randomBytes } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { generateSimulatePayload } from './generate-simulate-payload.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const KEYS_DIR = path.join(ROOT, 'packages/confidential-core/.dev-keys');
 const CRE_BIN = path.join(process.env.HOME ?? '', '.cre', 'bin', 'cre');
+
+function generateEthPrivateKey(): string {
+  const bytes = randomBytes(32);
+  return '0x' + bytes.toString('hex');
+}
 
 async function main() {
   if (!fs.existsSync(CRE_BIN)) {
@@ -29,6 +35,9 @@ async function main() {
   // To use confidential mode, change target to 'staging-settings'
   const target = 'simple-settings';
 
+  // Generate a random ETH private key for simulation if not provided
+  const ethPrivateKey = process.env.CRE_ETH_PRIVATE_KEY || generateEthPrivateKey();
+
   const result = spawnSync(
     CRE_BIN,
     [
@@ -45,9 +54,10 @@ async function main() {
       env: {
         ...process.env,
         PATH: `${localBin}:${nodeModulesBin}:${process.env.PATH}`,
-        TEE_ENC_PUB: secrets.tee.publicKey,
-        TEE_ENC_PRIV: secrets.tee.encPriv,
-        TEE_SIGN_PRIV: secrets.tee.signPriv,
+        CRE_ETH_PRIVATE_KEY: ethPrivateKey,
+        CRE_TEE_ENC_PUB: secrets.tee.publicKey,
+        CRE_TEE_ENC_PRIV: secrets.tee.encPriv,
+        CRE_TEE_SIGN_PRIV: secrets.tee.signPriv,
       },
     }
   );
