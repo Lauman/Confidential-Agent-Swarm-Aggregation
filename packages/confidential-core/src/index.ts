@@ -8,3 +8,4 @@ export * from './registry/signal-estimate.js';
 export * from './registry/registry.js';
 export * from './tee/process-batch.js';
 export * from './tee/keymap.js';
+export * from './tee/secrets.js';

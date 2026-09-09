@@ -27,17 +27,13 @@ async function main() {
     fs.readFileSync(path.join(KEYS_DIR, 'dev-secrets.json'), 'utf-8')
   ) as { tee: { publicKey: string; encPriv: string; signPriv: string } };
 
-  const workflowDir = path.join(ROOT, 'cre', 'aggregate');
-  const nodeModulesBin = path.join(workflowDir, 'node_modules', '.bin');
+  // Simulate targets (see workflow.yaml):
+  //   - 'staging-settings': confidential workflow (handlerInTee, needs beta access)
+  //   - 'plain-settings':   non-confidential twin of the same handler (no TEE)
+  //   - 'simple-settings':   hello-world cron workflow (connectivity check only)
+  const target = process.env.SIMULATE_TARGET || 'staging-settings';
 
-  const localBin = path.join(process.env.HOME ?? '', '.local', 'bin');
-  // Use simple-settings target for testing (no external dependencies)
-  // Other targets:
-  //   - 'staging-settings': Main workflow with confidential features (needs beta access)
-  //   - 'plain-settings': Non-confidential version (HTTPCapability WASM issues)
-  const target = 'simple-settings';
-
-  // Generate a random ETH private key for simulation if not provided
+  // Random ETH key for simulation when the workflow needs one and none is set.
   const ethPrivateKey = process.env.CRE_ETH_PRIVATE_KEY || generateEthPrivateKey();
 
   const result = spawnSync(
@@ -48,15 +44,18 @@ async function main() {
       '--non-interactive',
       '--trigger-index', '0',
       '--http-payload', 'aggregate/test-payload.json',
-      '--skip-type-checks',
     ],
     {
       cwd: path.join(ROOT, 'cre'),
       stdio: 'inherit',
       env: {
         ...process.env,
-        PATH: `${localBin}:${nodeModulesBin}:${process.env.PATH}`,
         CRE_ETH_PRIVATE_KEY: ethPrivateKey,
+        // staging (confidential): consumed via runtime.getSecret in simulate
+        TEE_ENC_PUB: secrets.tee.publicKey,
+        TEE_ENC_PRIV: secrets.tee.encPriv,
+        TEE_SIGN_PRIV: secrets.tee.signPriv,
+        // plain (non-confidential twin): read from process.env directly
         CRE_TEE_ENC_PUB: secrets.tee.publicKey,
         CRE_TEE_ENC_PRIV: secrets.tee.encPriv,
         CRE_TEE_SIGN_PRIV: secrets.tee.signPriv,

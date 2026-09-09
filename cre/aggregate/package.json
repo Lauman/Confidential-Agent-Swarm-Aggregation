@@ -11,7 +11,8 @@
     "test": "vitest run",
     "clean": "rm -rf dist",
     "generate:payload": "node --loader ts-node/esm scripts/generate-simulate-payload.ts",
-    "simulate": "node --loader ts-node/esm scripts/run-simulate.ts"
+    "simulate": "node --loader ts-node/esm scripts/run-simulate.ts",
+    "simulate:plain": "SIMULATE_TARGET=plain-settings node --loader ts-node/esm scripts/run-simulate.ts"
   },
   "dependencies": {
     "@chainlink/cre-sdk": "^1.19.0",
