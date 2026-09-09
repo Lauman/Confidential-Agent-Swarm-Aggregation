@@ -1,11 +1,3 @@
-export interface AgentSubmission {
-  agentId: string;
-  roundId: string;
-  value: number;
-  signature?: string;
-  timestamp: number;
-}
-
 export interface AgentIdentity {
   id: string;
   ensName?: string;
@@ -13,9 +5,12 @@ export interface AgentIdentity {
   publicKey?: string;
 }
 
+export type KeySource = 'keymap' | 'ens';
+
 export interface AgentConfig {
   id: string;
   coordinatorEndpoint: string;
-  dataSourceType: 'mock' | 'subgraph';
-  dataSourceConfig?: Record<string, unknown>;
+  keySource: KeySource;
+  keymapPath?: string;
+  agentPrivateKey?: string;
 }

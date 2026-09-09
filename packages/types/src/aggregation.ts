@@ -1,21 +1,22 @@
-import { AgentSubmission } from './agent.js';
+import type { EncryptedEnvelope } from './envelope.js';
+import type { TeeSignedResult } from './result.js';
 
-export interface AggregationRequest {
-  roundId: string;
-  submissions: AgentSubmission[];
-}
+export type RoundStatus = 'collecting' | 'closed' | 'aggregated' | 'failed';
 
-export interface AggregationResult {
+export interface RoundRecord {
   roundId: string;
-  aggregate: number;
-  participantCount: number;
-  timestamp: number;
-}
-
-export interface RoundState {
-  roundId: string;
-  submissions: Map<string, AgentSubmission>;
+  useCase: string;
   quorum: number;
-  status: 'collecting' | 'aggregating' | 'completed' | 'failed';
-  result?: AggregationResult;
+  status: RoundStatus;
+  submissionCount: number;
+  batchHash?: string;
+  result?: TeeSignedResult;
+  closedAt?: number;
+}
+
+export interface BatchHandoff {
+  roundId: string;
+  useCase: string;
+  batchHash: string;
+  envelopes: EncryptedEnvelope[];
 }

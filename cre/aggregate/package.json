@@ -1,0 +1,29 @@
+{
+  "name": "@private-signal-swarm/cre-workflow",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/workflow.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "rm -rf dist",
+    "generate:payload": "node --loader ts-node/esm scripts/generate-simulate-payload.ts",
+    "simulate": "node --loader ts-node/esm scripts/run-simulate.ts"
+  },
+  "dependencies": {
+    "@chainlink/cre-sdk": "^1.19.0",
+    "@chainlink/cre-sdk-javy-plugin": "1.7.0",
+    "@private-signal-swarm/confidential-core": "workspace:*",
+    "@private-signal-swarm/types": "workspace:*",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  }
+}
