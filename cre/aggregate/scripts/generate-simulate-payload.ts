@@ -12,9 +12,9 @@ import {
   type KeyMaterial,
 } from '@private-signal-swarm/confidential-core';
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../..');
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const KEYS_DIR = path.join(ROOT, 'packages/confidential-core/.dev-keys');
-const PAYLOAD_PATH = path.join(ROOT, 'cre/workflows/aggregate/test-payload.json');
+const PAYLOAD_PATH = path.join(ROOT, 'cre/aggregate/test-payload.json');
 
 const BALLOTS = [
   { agentId: 'agent-1', vote: 'support' as const, confidence: 0.9 },

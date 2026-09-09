@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@chainlink/cre-sdk": "^1.19.0",
+    "@chainlink/cre-sdk-javy-plugin": "1.7.0",
     "@private-signal-swarm/confidential-core": "workspace:*",
     "@private-signal-swarm/types": "workspace:*",
     "zod": "^3.23.0"

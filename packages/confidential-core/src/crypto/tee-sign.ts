@@ -1,5 +1,6 @@
+import { ed25519 } from '@noble/curves/ed25519.js';
 import { TEE_RESULT_VERSION } from '@private-signal-swarm/types';
-import { ready, toB64, fromB64 } from './bytes.js';
+import { toB64, fromB64 } from './bytes.js';
 
 export interface TeeResultSigningInput {
   useCase: string;
@@ -21,16 +22,19 @@ export function teeResultCanonical(result: TeeResultSigningInput): Uint8Array {
   return new TextEncoder().encode(canonical);
 }
 
-export async function teeSignResult(privB64: string, result: TeeResultSigningInput): Promise<string> {
-  const s = await ready();
-  const sig = s.crypto_sign_detached(teeResultCanonical(result), fromB64(privB64));
+export function teeSignResult(privB64: string, result: TeeResultSigningInput): string {
+  const privKey = fromB64(privB64);
+  const msg = teeResultCanonical(result);
+  const sig = ed25519.sign(msg, privKey);
   return toB64(sig);
 }
 
-export async function verifyTeeSignature(pubB64: string, result: TeeResultSigningInput, signatureB64: string): Promise<boolean> {
-  const s = await ready();
+export function verifyTeeSignature(pubB64: string, result: TeeResultSigningInput, signatureB64: string): boolean {
   try {
-    return s.crypto_sign_verify_detached(fromB64(signatureB64), teeResultCanonical(result), fromB64(pubB64));
+    const pubKey = fromB64(pubB64);
+    const sig = fromB64(signatureB64);
+    const msg = teeResultCanonical(result);
+    return ed25519.verify(sig, msg, pubKey);
   } catch {
     return false;
   }

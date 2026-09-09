@@ -1,0 +1,13 @@
+{
+  "name": "@private-signal-swarm/cre",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@chainlink/cre-sdk": "^1.19.0",
+    "@chainlink/cre-sdk-javy-plugin": "1.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  }
+}

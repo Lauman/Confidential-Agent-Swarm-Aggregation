@@ -1,0 +1,40 @@
+{
+  "roundId": "simulate-mtu32mkv",
+  "useCase": "deliberation.v1",
+  "keyId": "enclave-1",
+  "envelopes": [
+    {
+      "version": 1,
+      "useCase": "deliberation.v1",
+      "keyId": "enclave-1",
+      "agentId": "agent-1",
+      "roundId": "simulate-mtu32mkv",
+      "nonce": "c69cb0f4-c02d-4086-a417-bd0819781353",
+      "ciphertext": "ICaaH6ZsiBDvbUSwD88W43PAwmWgRw5/fycXG8wk5TFwwk2w4Dpw346IAZct5s8ox4e0wDoxDFTbEdPzVx/6NNUlBrS72RNRCoegVTT3kWdtmhKYPG9Ixij6BJoHeUFIlyWyhcMZ/zxzUhU/jRC7mru5xtf8DMGBTA==",
+      "timestamp": 1788957444560,
+      "signature": "u+T8aWES7wdE/U64fDnwBWh43mOsgTSCNZo3/mzItc+ixrjSxwmsGzIk+7Ss75Rh4Xp9qlSTzmwy1XgxEdB4BQ=="
+    },
+    {
+      "version": 1,
+      "useCase": "deliberation.v1",
+      "keyId": "enclave-1",
+      "agentId": "agent-2",
+      "roundId": "simulate-mtu32mkv",
+      "nonce": "1bc98a40-135b-4e8e-812b-66b640e16198",
+      "ciphertext": "2cBnSIUT08aH2vp1autUU8mLoMu/oN/yeQtEAbs1twMccZ+MuzFaH1eGWAngTUzbzu9XICLiB/+tkw1IO107C5MUUgS7FcFVvTvwfVZgdSPTxRM4a7ov2fwHTNbtjbi2S7EbRQ31C6Kc6KJ3YIaCjL1X+RnkgTKj7w==",
+      "timestamp": 1788957444561,
+      "signature": "Zs06zXqyJhRgoJMqtN655VKgWL3CQ2Zok1Ooc02Q/lulapfm+yxrdCd2xuPQBix+vJUV+6GvMOm6iHsqQUG9Cw=="
+    },
+    {
+      "version": 1,
+      "useCase": "deliberation.v1",
+      "keyId": "enclave-1",
+      "agentId": "agent-3",
+      "roundId": "simulate-mtu32mkv",
+      "nonce": "e449fb6c-7e1b-4d07-b629-827188fac319",
+      "ciphertext": "sDRPQ3mJRhAQ2xLdc+Ixse8GxBT5gyCMtHIuhretqhoMNSahTdByph79It95/mJAjp0KrUOgQOAy+vk6IHLUWr0tdO3trkb0A5sEPsjwBZCmYoUuM8XjIhzvOMG8v24bHxzWSM8YF4NBzndvWGU9uYDlYptbGBlL",
+      "timestamp": 1788957444562,
+      "signature": "VlyF0dFb//exUMqrrTO1IQKWi6Jl9dtAyUm/G5lgloeCOE5/DVtzcFYTG5RlDrAycAEiA58CmE3aFuAkJzy6Cw=="
+    }
+  ]
+}

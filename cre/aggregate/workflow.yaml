@@ -1,0 +1,44 @@
+staging-settings:
+  user-workflow:
+    workflow-name: "private-signal-swarm-aggregate-staging"
+    deployment-registry: "private"
+  workflow-artifacts:
+    workflow-path: "./src/workflow.ts"
+    config-path: "./config.staging.json"
+    secrets-path: "../secrets.yaml"
+
+plain-settings:
+  user-workflow:
+    workflow-name: "private-signal-swarm-aggregate-plain"
+    deployment-registry: "private"
+  workflow-artifacts:
+    workflow-path: "./src/workflow-plain.ts"
+    config-path: "./config.staging.json"
+    secrets-path: "../secrets.yaml"
+
+cron-poll-settings:
+  user-workflow:
+    workflow-name: "private-signal-swarm-aggregate-cron-poll"
+    deployment-registry: "private"
+  workflow-artifacts:
+    workflow-path: "./src/workflow-cron-poll.ts"
+    config-path: "./config.staging.json"
+    secrets-path: "../secrets.yaml"
+
+simple-settings:
+  user-workflow:
+    workflow-name: "private-signal-swarm-aggregate-simple"
+    deployment-registry: "private"
+  workflow-artifacts:
+    workflow-path: "./src/workflow-simple.ts"
+    config-path: "./config.staging.json"
+    secrets-path: "../secrets.yaml"
+
+minimal-settings:
+  user-workflow:
+    workflow-name: "private-signal-swarm-aggregate-minimal"
+    deployment-registry: "private"
+  workflow-artifacts:
+    workflow-path: "./src/workflow-minimal.ts"
+    config-path: "./config.staging.json"
+    secrets-path: "../secrets.yaml"
