@@ -90,9 +90,11 @@ async function runAggregation(
 
 const initWorkflow = (config: Config) => {
   const http = new HTTPCapability();
-  // Use empty config for simulation (no authorization required)
+  const authorizedKeys = config.coordinatorAddress
+    ? [{ type: 'KEY_TYPE_ECDSA_EVM' as const, publicKey: config.coordinatorAddress }]
+    : [];
   return [
-    handler(http.trigger({}), onHttpTrigger),
+    handler(http.trigger({ authorizedKeys }), onHttpTrigger),
   ];
 };
 

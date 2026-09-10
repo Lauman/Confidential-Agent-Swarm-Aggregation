@@ -85,6 +85,28 @@ cd cre/aggregate
 pnpm simulate
 ```
 
+## Run Deployed CRE Workflow
+
+```bash
+# 1. Generate local dev keys (gitignored) and build
+pnpm --filter @private-signal-swarm/confidential-core keygen
+pnpm build
+
+# 2. Store TEE secrets in the Vault DON (values read from cre/.env)
+cd cre
+cre secrets create secrets.yaml --target staging-settings --secrets-auth=browser
+
+# 3. Deploy the non-TEE workflow (staging-settings needs Confidential beta access)
+cre workflow deploy aggregate --target plain-settings --yes
+
+# 4. Trigger it (prints execution ID; key auto-loaded from cre/.env)
+CRE_WORKFLOW_ID=<workflow-id> pnpm --filter @private-signal-swarm/coordinator trigger:deployed
+
+# 5. Check result
+cre execution status <execution-id> --target plain-settings
+cre execution logs <execution-id> --target plain-settings
+```
+
 ## Project Structure
 
 ```

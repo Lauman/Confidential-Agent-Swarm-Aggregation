@@ -6,7 +6,7 @@
  * Env:
  *   COORDINATOR_SIGNING_KEY  0x ECDSA key matching workflow authorizedKeys
  *                            (defaults to HEDERA_PRIVATE_KEY — same account)
- *   CRE_GATEWAY_URL          default https://01.enterprise-gateway.zone-a.cre.chain.link/
+ *   CRE_GATEWAY_URL          default https://01.gateway.zone-a.cre.chain.link/
  *   CRE_WORKFLOW_ID          default = Bombus staging deployment
  *   KEYMAP_PATH / DEV_SECRETS_PATH (dev key files)
  *
@@ -26,6 +26,34 @@ import { DeployedWorkflowTrigger } from '../src/trigger-client.js';
 
 const ROOT = findWorkspaceRoot(fileURLToPath(import.meta.url));
 
+function loadDotEnvFile(filePath: string): void {
+  if (!fs.existsSync(filePath)) {
+    return;
+  }
+  const content = fs.readFileSync(filePath, 'utf-8');
+  for (const line of content.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#') || !trimmed.includes('=')) {
+      continue;
+    }
+    const idx = trimmed.indexOf('=');
+    const key = trimmed.slice(0, idx).trim();
+    let value = trimmed.slice(idx + 1).trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+    if (key && process.env[key] === undefined) {
+      process.env[key] = value;
+    }
+  }
+}
+
+loadDotEnvFile(path.join(ROOT, '.env'));
+loadDotEnvFile(path.join(ROOT, 'cre', '.env'));
+
 function findWorkspaceRoot(start: string): string {
   let dir = path.dirname(start);
   for (;;) {
@@ -41,12 +69,17 @@ function findWorkspaceRoot(start: string): string {
 }
 const WORKFLOW_ID =
   process.env.CRE_WORKFLOW_ID || '007a91ee992fc7e62fedebd0e86c4b64978886d09fed0cc001f615727a33132c';
-const GATEWAY = process.env.CRE_GATEWAY_URL || 'https://01.enterprise-gateway.zone-a.cre.chain.link/';
+const GATEWAY = process.env.CRE_GATEWAY_URL || 'https://01.gateway.zone-a.cre.chain.link/';
 
 async function main(): Promise<void> {
-  const signingKey = process.env.COORDINATOR_SIGNING_KEY || process.env.HEDERA_PRIVATE_KEY;
+  const signingKey =
+    process.env.COORDINATOR_SIGNING_KEY ||
+    process.env.TRIGGER_PRIVATE_KEY ||
+    process.env.HEDERA_PRIVATE_KEY;
   if (!signingKey) {
-    throw new Error('Set COORDINATOR_SIGNING_KEY (or HEDERA_PRIVATE_KEY — same account)');
+    throw new Error(
+      'Set COORDINATOR_SIGNING_KEY, TRIGGER_PRIVATE_KEY (cre/.env), or HEDERA_PRIVATE_KEY — must match workflow authorizedKeys'
+    );
   }
 
   const keymapPath =
@@ -54,7 +87,16 @@ async function main(): Promise<void> {
   const secretsPath =
     process.env.DEV_SECRETS_PATH ||
     path.join(ROOT, 'packages/confidential-core/.dev-keys/dev-secrets.json');
+  if (!fs.existsSync(keymapPath) || !fs.existsSync(secretsPath)) {
+    throw new Error(
+      `Missing dev keys at ${path.dirname(keymapPath)}. Run: pnpm --filter @private-signal-swarm/confidential-core keygen`
+    );
+  }
   const keymap = JSON.parse(fs.readFileSync(keymapPath, 'utf-8')) as KeymapFile;
+  if (process.env.CRE_TEE_ENC_PUB && process.env.CRE_TEE_ENC_PUB !== keymap.tee.encPub) {
+    keymap.tee.encPub = process.env.CRE_TEE_ENC_PUB;
+    console.log('Sealing envelopes to Vault TEE pubkey from cre/.env');
+  }
   const secrets = JSON.parse(fs.readFileSync(secretsPath, 'utf-8')) as {
     agents: Record<string, { signPriv: string }>;
   };
