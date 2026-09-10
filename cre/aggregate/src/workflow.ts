@@ -56,10 +56,14 @@ const onHttpTrigger = async (
 
   // NOTE: getSecret().result() returns a Secret MESSAGE ({ value }), not a string.
   const secrets: ProcessBatchSecrets = {
-    teeEncPub: secretToString(runtime.getSecret({ id: 'TEE_ENC_PUB' }).result()),
-    teeEncPriv: secretToString(runtime.getSecret({ id: 'TEE_ENC_PRIV' }).result()),
-    teeSignPriv: secretToString(runtime.getSecret({ id: 'TEE_SIGN_PRIV' }).result()),
+    teeEncPub: secretToString(runtime.getSecret({ id: 'TEE_ENC_PUB', namespace: 'main' }).result()),
+    teeEncPriv: secretToString(runtime.getSecret({ id: 'TEE_ENC_PRIV', namespace: 'main' }).result()),
+    teeSignPriv: secretToString(runtime.getSecret({ id: 'TEE_SIGN_PRIV', namespace: 'main' }).result()),
   };
+
+  if (!secrets.teeEncPub || !secrets.teeEncPriv || !secrets.teeSignPriv) {
+    throw new Error('Missing TEE secrets in environment variables');
+  }
 
   // Decrypt → validate → registry dispatch → small-N suppression → tally → sign.
   // Individual ballots are decrypted inside this enclave and never leave it;
