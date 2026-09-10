@@ -6,7 +6,7 @@ import { verdictRouter, bindResultStore } from './routes/verdict.js';
 import { createX402Middleware } from './x402/middleware.js';
 import { VerifiedResultStore } from './result-store.js';
 import type { KeymapFile } from '@private-signal-swarm/confidential-core';
-import type { Network } from 'x402-express';
+import type { Network } from '@x402/express';
 
 const WORKSPACE_ROOT = path.resolve(path.dirname(url.fileURLToPath(import.meta.url)), '..', '..', '..');
 
@@ -48,9 +48,10 @@ export function createApp(): ResourceServer {
   app.use('/api', availabilityGate);
 
   const payTo = process.env.X402_PAY_TO;
-  const network = (process.env.X402_NETWORK || 'base-sepolia') as Network;
+  const network = (process.env.X402_NETWORK || 'hedera:testnet') as Network;
   const price = process.env.X402_PRICE || '$0.01';
-  const facilitatorUrl = process.env.X402_FACILITATOR_URL;
+  const facilitatorUrl =
+    process.env.X402_FACILITATOR_URL || 'https://api.testnet.blocky402.com';
 
   if (payTo) {
     app.use(

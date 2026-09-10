@@ -16,7 +16,24 @@ export const ballotSchema = z.object({
   rationaleRedacted: z.string().optional(),
 });
 
+export class IncoherentBatchError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'IncoherentBatchError';
+  }
+}
+
 export function tallyBallots(ballots: DeliberationBallot[]): DeliberationVerdict {
+  // Coherence guard: the (blind) coordinator cannot see proposalRefs, so the
+  // enclave must refuse to tally ballots that deliberate on different
+  // proposals. A poisoned round aborts with no result — never a partial one.
+  const refs = new Set(ballots.map((b) => b.proposalRef));
+  if (refs.size > 1) {
+    throw new IncoherentBatchError(
+      `Batch mixes ${refs.size} proposalRefs: ${Array.from(refs).join(', ')}`
+    );
+  }
+
   const w: DeliberationTally = { support: 0, oppose: 0, abstain: 0 };
   for (const b of ballots) {
     w[b.vote] += b.confidence;

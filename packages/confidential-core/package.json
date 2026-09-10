@@ -24,7 +24,6 @@
     "@noble/curves": "^2.4.0",
     "@noble/hashes": "^2.4.0",
     "@private-signal-swarm/types": "workspace:*",
-    "libsodium-wrappers": "0.7.14",
     "zod": "^3.23.0"
   },
   "devDependencies": {

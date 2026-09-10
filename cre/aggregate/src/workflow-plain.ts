@@ -9,6 +9,7 @@ import {
 import { z } from 'zod';
 import {
   processBatch,
+  secretToString,
   type ProcessBatchSecrets,
 } from '@private-signal-swarm/confidential-core';
 import { ENVELOPE_VERSION, type TeeSignedResult } from '@private-signal-swarm/types';
@@ -53,11 +54,22 @@ const onHttpTrigger = async (
 
   const batch = batchSchema.parse(decodeJson(payload.input));
 
-  // For non-confidential mode, secrets come from environment variables
+  return runAggregation(runtime, batch);
+};
+
+async function runAggregation(
+  runtime: Runtime<Config>,
+  batch: z.infer<typeof batchSchema>
+): Promise<TeeWorkflowResult> {
+
+  // Non-confidential twin: same handler logic, secrets via the same
+  // getSecret path (injected from env in simulation). The CRE WASM runtime
+  // has no Node `process` global, so process.env must never be read here.
+  // NOTE: getSecret().result() returns a Secret MESSAGE ({ value }), not a string.
   const secrets: ProcessBatchSecrets = {
-    teeEncPub: process.env.CRE_TEE_ENC_PUB ?? '',
-    teeEncPriv: process.env.CRE_TEE_ENC_PRIV ?? '',
-    teeSignPriv: process.env.CRE_TEE_SIGN_PRIV ?? '',
+    teeEncPub: secretToString(runtime.getSecret({ id: 'TEE_ENC_PUB' }).result()),
+    teeEncPriv: secretToString(runtime.getSecret({ id: 'TEE_ENC_PRIV' }).result()),
+    teeSignPriv: secretToString(runtime.getSecret({ id: 'TEE_SIGN_PRIV' }).result()),
   };
 
   if (!secrets.teeEncPub || !secrets.teeEncPriv || !secrets.teeSignPriv) {

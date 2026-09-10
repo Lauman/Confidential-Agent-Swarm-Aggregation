@@ -9,6 +9,7 @@ import {
 import { z } from 'zod';
 import {
   processBatch,
+  secretToString,
   type ProcessBatchSecrets,
 } from '@private-signal-swarm/confidential-core';
 import { ENVELOPE_VERSION, type TeeSignedResult } from '@private-signal-swarm/types';
@@ -53,10 +54,11 @@ const onHttpTrigger = async (
 
   const batch = batchSchema.parse(decodeJson(payload.input));
 
+  // NOTE: getSecret().result() returns a Secret MESSAGE ({ value }), not a string.
   const secrets: ProcessBatchSecrets = {
-    teeEncPub: runtime.getSecret({ id: 'TEE_ENC_PUB' }).result() as unknown as string,
-    teeEncPriv: runtime.getSecret({ id: 'TEE_ENC_PRIV' }).result() as unknown as string,
-    teeSignPriv: runtime.getSecret({ id: 'TEE_SIGN_PRIV' }).result() as unknown as string,
+    teeEncPub: secretToString(runtime.getSecret({ id: 'TEE_ENC_PUB' }).result()),
+    teeEncPriv: secretToString(runtime.getSecret({ id: 'TEE_ENC_PRIV' }).result()),
+    teeSignPriv: secretToString(runtime.getSecret({ id: 'TEE_SIGN_PRIV' }).result()),
   };
 
   // Decrypt → validate → registry dispatch → small-N suppression → tally → sign.

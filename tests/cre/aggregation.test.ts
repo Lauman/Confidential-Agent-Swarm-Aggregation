@@ -47,6 +47,15 @@ describe('deliberation tally (inside-TEE aggregate function)', () => {
     ]);
     expect(large.tally).toBeDefined();
   });
+
+  it('rejects mixed-proposalRef batches (coherence guard — blind coordinator cannot)', () => {
+    expect(() =>
+      tallyBallots([
+        { proposalRef: 'prop-a', vote: 'support', confidence: 1 },
+        { proposalRef: 'prop-b', vote: 'support', confidence: 1 },
+      ])
+    ).toThrow(/proposalRefs/);
+  });
 });
 
 describe('processBatch (TEE handler body, local)', () => {
