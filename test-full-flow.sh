@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+cd "$(dirname "$0")"
 
 echo "=== Cleaning up ==="
 pkill -f "coordinator" 2>/dev/null || true
@@ -11,7 +12,6 @@ pnpm build
 
 echo ""
 echo "=== Step 1: Starting Coordinator (port 3001) ==="
-cd /home/ldisanza/proyectos/Confidential-Agent-Swarm-Aggregation
 RESULT_INGEST_URL=http://localhost:3000/api/internal/ingest \
   node apps/coordinator/dist/server.js &
 COORD_PID=$!
