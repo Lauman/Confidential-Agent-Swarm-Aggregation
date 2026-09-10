@@ -61,6 +61,10 @@ const onHttpTrigger = async (
     teeSignPriv: secretToString(runtime.getSecret({ id: 'TEE_SIGN_PRIV' }).result()),
   };
 
+  if (!secrets.teeEncPub || !secrets.teeEncPriv || !secrets.teeSignPriv) {
+    throw new Error('Missing TEE secrets in environment variables');
+  }
+
   // Decrypt → validate → registry dispatch → small-N suppression → tally → sign.
   // Individual ballots are decrypted inside this enclave and never leave it;
   // only the signed aggregate result is returned.
