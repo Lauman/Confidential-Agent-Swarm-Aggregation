@@ -1,7 +1,9 @@
-import type { AgentConfig } from '@private-signal-swarm/types';
+import type { AgentConfig, UseCaseId } from '@private-signal-swarm/types';
+import { USE_CASES } from '@private-signal-swarm/types';
 import { CoordinatorClient, CoordinatorClientError } from './coordinator-client.js';
 import { EnvelopeFactory, loadAgentPrivateKey } from './crypto.js';
 import { DELIBERATION_USE_CASE, deliberateMock } from './payload/deliberation.js';
+import { SIGNAL_ESTIMATE_USE_CASE, estimateMock } from './payload/signal-estimate.js';
 
 export interface AgentRunResult {
   status: 'submitted' | 'quorum-reached' | 'skipped';
@@ -26,17 +28,25 @@ export class Agent {
     this.coordinator = new CoordinatorClient(config.coordinatorEndpoint);
   }
 
-  async run(proposalRef: string): Promise<AgentRunResult> {
-    const ballot = deliberateMock(this.config.id, proposalRef);
+  async run(proposalRef: string, useCase: UseCaseId = DELIBERATION_USE_CASE): Promise<AgentRunResult> {
+    let ballot: unknown;
+
+    if (useCase === USE_CASES.deliberation) {
+      ballot = deliberateMock(this.config.id, proposalRef);
+    } else if (useCase === USE_CASES.signalEstimate) {
+      ballot = estimateMock(this.config.id, proposalRef);
+    } else {
+      throw new Error(`Unsupported use case: ${useCase}`);
+    }
 
     let roundId: string;
     try {
-      roundId = await this.coordinator.getCurrentRoundId(DELIBERATION_USE_CASE);
+      roundId = await this.coordinator.getCurrentRoundId(useCase);
     } catch (error) {
       throw new Error(`Agent ${this.config.id} could not get current round: ${(error as Error).message}`);
     }
 
-    const envelope = await this.envelopes.createEnvelope(roundId, DELIBERATION_USE_CASE, ballot);
+    const envelope = await this.envelopes.createEnvelope(roundId, useCase, ballot);
 
     let outcome;
     try {
@@ -44,7 +54,7 @@ export class Agent {
     } catch (error) {
       if (error instanceof CoordinatorClientError && error.code === 'unknown-key') {
         this.envelopes.reloadKeymap();
-        const retry = await this.envelopes.createEnvelope(roundId, DELIBERATION_USE_CASE, ballot);
+        const retry = await this.envelopes.createEnvelope(roundId, useCase, ballot);
         outcome = await this.coordinator.submit(retry);
       } else {
         throw error;

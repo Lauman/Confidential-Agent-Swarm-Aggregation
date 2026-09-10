@@ -54,8 +54,9 @@ coordinatorRouter.post('/submit', async (req, res) => {
   }
 });
 
-function sanitizeRound(record: RoundRecord) {
-  return record;
+function sanitizeRound(record: RoundRecord): Omit<RoundRecord, 'result'> {
+  const { result, ...sanitized } = record;
+  return sanitized;
 }
 
 coordinatorRouter.get('/round/:roundId', (req, res) => {

@@ -5,7 +5,7 @@ import {
 } from '@x402/express';
 import { HTTPFacilitatorClient } from '@x402/core/server';
 import { ExactHederaScheme } from '@x402/hedera/exact/server';
-import type { RequestHandler } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 
 export interface X402Config {
   /** Hedera account receiving payment, e.g. 0.0.1234 */
@@ -19,14 +19,14 @@ export interface X402Config {
   maxTimeoutSeconds?: number;
 }
 
-export function createX402Middleware(config: X402Config): RequestHandler {
+export function createX402Middleware(config: X402Config) {
   const facilitator = new HTTPFacilitatorClient({ url: config.facilitatorUrl });
   const resourceServer = new x402ResourceServer(facilitator).register(
     config.network,
     new ExactHederaScheme()
   );
 
-  return paymentMiddleware(
+  const handler = paymentMiddleware(
     {
       'GET /api/verdict': {
         accepts: {
@@ -40,5 +40,8 @@ export function createX402Middleware(config: X402Config): RequestHandler {
       },
     },
     resourceServer
-  ) as unknown as RequestHandler;
+  );
+
+  // x402 middleware returns a compatible handler but TypeScript can't verify the types
+  return (req: Request, res: Response, next: NextFunction) => handler(req, res, next);
 }

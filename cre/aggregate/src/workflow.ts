@@ -56,9 +56,9 @@ const onHttpTrigger = async (
 
   // NOTE: getSecret().result() returns a Secret MESSAGE ({ value }), not a string.
   const secrets: ProcessBatchSecrets = {
-    teeEncPub: secretToString(runtime.getSecret({ id: 'TEE_ENC_PUB' }).result()),
-    teeEncPriv: secretToString(runtime.getSecret({ id: 'TEE_ENC_PRIV' }).result()),
-    teeSignPriv: secretToString(runtime.getSecret({ id: 'TEE_SIGN_PRIV' }).result()),
+    teeEncPub: secretToString(runtime.getSecret({ id: 'TEE_ENC_PUB', namespace: 'main' }).result()),
+    teeEncPriv: secretToString(runtime.getSecret({ id: 'TEE_ENC_PRIV', namespace: 'main' }).result()),
+    teeSignPriv: secretToString(runtime.getSecret({ id: 'TEE_SIGN_PRIV', namespace: 'main' }).result()),
   };
 
   if (!secrets.teeEncPub || !secrets.teeEncPriv || !secrets.teeSignPriv) {
