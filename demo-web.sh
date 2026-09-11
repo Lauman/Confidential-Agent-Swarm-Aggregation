@@ -31,7 +31,11 @@ RESULT_INGEST_URL=http://localhost:3000/api/internal/ingest \
 COORD_PID=$!
 
 echo "=== Starting Resource Server (:3000, dev mode) ==="
-node apps/resource-server/dist/server.js &
+# Forced free mode: the UI fetches with plain fetch (no wallet), so any
+# X402_PAY_TO leaked from the shell would 402 every verdict request.
+# (Paid access is proven separately via pay:verdict + the receipt panel.)
+env -u X402_PAY_TO -u X402_FACILITATOR_URL \
+  node apps/resource-server/dist/server.js &
 RS_PID=$!
 
 echo "=== Starting Web UI (:5173) ==="
