@@ -1,10 +1,12 @@
 import express, { type Express } from 'express';
 import { coordinatorRouter } from './coordinator.js';
+import { demoRouter } from './routes/demo.js';
 
 export function createApp(): Express {
   const app: Express = express();
   app.use(express.json());
   app.use('/', coordinatorRouter);
+  app.use('/', demoRouter);
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: Date.now() });
   });

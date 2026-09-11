@@ -17,7 +17,7 @@ import {
   type KeyMaterial,
 } from '@private-signal-swarm/confidential-core';
 import { RoundManager } from '../../apps/coordinator/src/round-manager.js';
-import { TombstoneStore, computeBatchHash } from '../../apps/coordinator/src/tombstone-store.js';
+import { TombstoneStore, computeBatchHash, computeEnvelopeHash } from '../../apps/coordinator/src/tombstone-store.js';
 import { LocalTeeRunner } from '../../apps/coordinator/src/tee-seam.js';
 import { EnvelopeValidationError } from '../../apps/coordinator/src/envelope-validator.js';
 
@@ -205,5 +205,55 @@ describe('EnvelopeValidationError codes', () => {
     const err = new EnvelopeValidationError('round-closed', 'nope');
     expect(err.code).toBe('round-closed');
     expect(err.name).toBe('EnvelopeValidationError');
+  });
+});
+
+describe('submittedAgents (UI swarm feed)', () => {
+  it('exposes quorum, empty list, and growing metadata on the current round', async () => {
+    const manager = makeManager(makeStore());
+    const record = manager.getCurrentRound(USE_CASES.deliberation);
+
+    expect(record.quorum).toBe(3);
+    expect(record.status).toBe('collecting');
+    expect(record.submissionCount).toBe(0);
+    expect(record.submittedAgents).toEqual([]);
+
+    const e1 = await makeEnvelope(0, record.roundId, { proposalRef: 'p', vote: 'support', confidence: 0.9 });
+    await manager.handleSubmit(e1);
+
+    const updated = manager.getRoundRecord(record.roundId)!;
+    expect(updated.submissionCount).toBe(1);
+    expect(updated.submittedAgents).toHaveLength(1);
+    expect(updated.submittedAgents[0].agentId).toBe('agent-1');
+    expect(updated.submittedAgents[0].envelopeHash).toBe(computeEnvelopeHash(e1.ciphertext));
+    expect(typeof updated.submittedAgents[0].submittedAt).toBe('number');
+    // metadata only: no ciphertext, no plaintext anywhere in the record
+    expect(JSON.stringify(updated)).not.toContain(e1.ciphertext.slice(0, 16));
+  });
+
+  it('retains the ordered list on the closed record and across restarts', async () => {
+    const sharedDir = fs.mkdtempSync(path.join(os.tmpdir(), 'swarm-persist-'));
+    const manager = makeManager(new TombstoneStore(sharedDir));
+    const roundId = manager.getCurrentRoundId(USE_CASES.deliberation);
+
+    const envs = [];
+    for (let i = 0; i < 3; i++) {
+      const e = await makeEnvelope(i, roundId, { proposalRef: 'p', vote: 'support', confidence: 0.5 });
+      envs.push(e);
+      await manager.handleSubmit(e);
+    }
+
+    const closed = manager.getRoundRecord(roundId)!;
+    expect(closed.status).toBe('aggregated');
+    expect(closed.submittedAgents.map((a) => a.agentId)).toEqual(['agent-1', 'agent-2', 'agent-3']);
+    expect(closed.submittedAgents.map((a) => a.envelopeHash)).toEqual(
+      envs.map((e) => computeEnvelopeHash(e.ciphertext))
+    );
+
+    // true restart: new store + manager over the SAME persisted dir
+    const manager2 = makeManager(new TombstoneStore(sharedDir));
+    const reopened = manager2.getRoundRecord(roundId)!;
+    expect(reopened.status).toBe('aggregated');
+    expect(reopened.submittedAgents.map((a) => a.agentId)).toEqual(['agent-1', 'agent-2', 'agent-3']);
   });
 });
