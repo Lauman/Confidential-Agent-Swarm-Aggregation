@@ -99,6 +99,10 @@ function required(name: string): string {
   return value;
 }
 
+function resolveRoot(p: string): string {
+  return path.isAbsolute(p) ? p : path.join(ROOT, p);
+}
+
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -163,9 +167,9 @@ async function main(): Promise<void> {
     throw new Error(`deployed probe supports deliberation rounds only (got ${batch.useCase})`);
   }
 
-  const secretsPath =
-    process.env.DEV_SECRETS_PATH ||
-    path.join(ROOT, 'packages/confidential-core/.dev-keys/dev-secrets.json');
+  const secretsPath = resolveRoot(
+    process.env.DEV_SECRETS_PATH || 'packages/confidential-core/.dev-keys/dev-secrets.json'
+  );
   const secrets = JSON.parse(fs.readFileSync(secretsPath, 'utf-8')) as {
     agents: Record<string, { signPriv: string }>;
   };
