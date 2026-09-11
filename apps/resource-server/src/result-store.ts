@@ -31,10 +31,20 @@ export class ResultVerificationError extends Error {
 
 export class VerifiedResultStore {
   private readonly teeSignPub: string;
+  private readonly keyId: string;
   private readonly latest = new Map<string, TeeSignedResult>();
 
   constructor(keymap: KeymapFile) {
     this.teeSignPub = keymap.tee.signPub;
+    this.keyId = keymap.keyId;
+  }
+
+  get teePub(): string {
+    return this.teeSignPub;
+  }
+
+  get currentKeyId(): string {
+    return this.keyId;
   }
 
   async ingest(input: unknown): Promise<TeeSignedResult> {
