@@ -45,6 +45,11 @@ echo ""
 curl -s http://localhost:3001/health >/dev/null && echo "Coordinator:      ✓ http://localhost:3001/health" || echo "Coordinator:      ✗ NOT UP"
 curl -s http://localhost:3000/api/status >/dev/null && echo "Resource server:  ✓ http://localhost:3000/api/status" || echo "Resource server:  ✗ NOT UP"
 curl -s http://localhost:5173/ >/dev/null && echo "Web UI:           ✓ http://localhost:5173" || echo "Web UI:           ✗ NOT UP"
+if [ -n "${CRE_GATEWAY_URL:-}" ] && [ -n "${CRE_WORKFLOW_ID:-}" ] && [ -n "${DON_TEE_ENC_PUB:-${CRE_TEE_ENC_PUB:-}}" ]; then
+  echo "CRE trigger:      ✓ ARMED (Deliberate also fires the deployed DON workflow)"
+else
+  echo "CRE trigger:      off (set CRE_GATEWAY_URL, CRE_WORKFLOW_ID, COORDINATOR_SIGNING_KEY, DON_TEE_ENC_PUB to also run each round on the DON)"
+fi
 echo ""
 echo "Open http://localhost:5173 and press Deliberate. Ctrl-C to stop everything."
 wait

@@ -30,6 +30,7 @@ export interface RoundManagerOptions {
   store: TombstoneStore;
   keyId: string;
   onResult?: (result: TeeSignedResult) => void;
+  deployedAttestor?: { attest(batch: BatchRequest): Promise<string | undefined> };
 }
 
 export class RoundManager {
@@ -39,6 +40,7 @@ export class RoundManager {
   private readonly store: TombstoneStore;
   private readonly keyId: string;
   private readonly onResult?: (result: TeeSignedResult) => void;
+  private readonly deployedAttestor?: { attest(batch: BatchRequest): Promise<string | undefined> };
   private readonly currentRoundByUseCase = new Map<string, string>();
 
   constructor(options: RoundManagerOptions) {
@@ -47,6 +49,7 @@ export class RoundManager {
     this.store = options.store;
     this.keyId = options.keyId;
     this.onResult = options.onResult;
+    this.deployedAttestor = options.deployedAttestor;
   }
 
   getCurrentRoundId(useCase: string): string {
@@ -156,6 +159,17 @@ export class RoundManager {
 
     this.store.recordResult(result);
     this.onResult?.(result);
+    if (this.deployedAttestor) {
+      const attestor = this.deployedAttestor;
+      void attestor
+        .attest(batch)
+        .then((executionId) => {
+          console.log(`[coordinator] DON execution triggered for ${batch.roundId}: ${executionId ?? '(no execution id)'}`);
+        })
+        .catch((error) => {
+          console.error(`[coordinator] DON trigger failed for ${batch.roundId}: ${error instanceof Error ? error.message : error}`);
+        });
+    }
     return result;
   }
 
