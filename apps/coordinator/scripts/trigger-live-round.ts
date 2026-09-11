@@ -18,7 +18,7 @@
  *   CRE_WORKFLOW_ID   default = deployed plain aggregation workflow
  *   CRE_GATEWAY_URL   default = zone-a gateway
  *   COORDINATOR_SIGNING_KEY | TRIGGER_PRIVATE_KEY | HEDERA_PRIVATE_KEY
- *   DON_TEE_ENC_PUB   DON vault TEE pubkey (default: CRE_TEE_ENC_PUB from cre/.env)
+ *   DON_TEE_ENC_PUB   DON vault TEE pubkey (default: CRE_TEE_ENC_PUB from .env)
  *   DON_TEE_SIGN_PUB  DON vault TEE sign pubkey, for result verification when
  *                     deployments log the full result (default: derived constant)
  *   CRE_BIN           default $HOME/.cre/bin/cre
@@ -88,6 +88,7 @@ function loadDotEnvFile(filePath: string): void {
   }
 }
 
+// Single root .env (cre/.env kept as legacy fallback if present).
 loadDotEnvFile(path.join(ROOT, '.env'));
 loadDotEnvFile(path.join(ROOT, 'cre', '.env'));
 
@@ -153,7 +154,7 @@ async function main(): Promise<void> {
   }
   const donEncPub = process.env.DON_TEE_ENC_PUB || process.env.CRE_TEE_ENC_PUB;
   if (!donEncPub) {
-    throw new Error('Set DON_TEE_ENC_PUB (or CRE_TEE_ENC_PUB in cre/.env)');
+    throw new Error('Set DON_TEE_ENC_PUB (or CRE_TEE_ENC_PUB in .env)');
   }
 
   const batch = JSON.parse(fs.readFileSync(batchPath, 'utf-8')) as {

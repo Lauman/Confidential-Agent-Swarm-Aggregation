@@ -22,7 +22,7 @@ import { DeployedWorkflowTrigger } from '../../apps/coordinator/src/trigger-clie
  * polls the execution to a terminal state, and asserts the DON really ran
  * this round: status SUCCESS + roundId/participants attested in DON logs.
  *
- * Needs: built workspace (`pnpm build`), CRE CLI, cre/.env with
+ * Needs: built workspace (`pnpm build`), CRE CLI, root .env with
  * TRIGGER_PRIVATE_KEY (authorized signer) + CRE_TEE_ENC_PUB (vault key),
  * and dev keys under packages/confidential-core/.dev-keys.
  * Run: LIVE_DON_TEST=1 pnpm --filter @private-signal-swarm/cre-workflow test
