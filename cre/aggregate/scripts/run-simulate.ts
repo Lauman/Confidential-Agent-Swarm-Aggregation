@@ -54,7 +54,7 @@ async function main() {
   const ethPrivateKey = process.env.CRE_ETH_PRIVATE_KEY || generateEthPrivateKey();
 
   // The CLI resolves workflow secrets (cre/secrets.yaml) from an env file,
-  // and a stale cre/.env silently overrides process env — so always write a
+  // and a stale env file silently overrides process env — so always write a
   // fresh env file from the current dev keys and pass it explicitly with -e.
   // This keeps simulate hermetic across key rotations.
   const envFile = path.join(CRE_DIR, '.env.simulate');

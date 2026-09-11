@@ -51,6 +51,7 @@ function loadDotEnvFile(filePath: string): void {
   }
 }
 
+// Single root .env (cre/.env kept as legacy fallback if present).
 loadDotEnvFile(path.join(ROOT, '.env'));
 loadDotEnvFile(path.join(ROOT, 'cre', '.env'));
 
@@ -78,7 +79,7 @@ async function main(): Promise<void> {
     process.env.HEDERA_PRIVATE_KEY;
   if (!signingKey) {
     throw new Error(
-      'Set COORDINATOR_SIGNING_KEY, TRIGGER_PRIVATE_KEY (cre/.env), or HEDERA_PRIVATE_KEY — must match workflow authorizedKeys'
+      'Set COORDINATOR_SIGNING_KEY, TRIGGER_PRIVATE_KEY (.env), or HEDERA_PRIVATE_KEY — must match workflow authorizedKeys'
     );
   }
 
@@ -95,7 +96,7 @@ async function main(): Promise<void> {
   const keymap = JSON.parse(fs.readFileSync(keymapPath, 'utf-8')) as KeymapFile;
   if (process.env.CRE_TEE_ENC_PUB && process.env.CRE_TEE_ENC_PUB !== keymap.tee.encPub) {
     keymap.tee.encPub = process.env.CRE_TEE_ENC_PUB;
-    console.log('Sealing envelopes to Vault TEE pubkey from cre/.env');
+    console.log('Sealing envelopes to Vault TEE pubkey from .env');
   }
   const secrets = JSON.parse(fs.readFileSync(secretsPath, 'utf-8')) as {
     agents: Record<string, { signPriv: string }>;

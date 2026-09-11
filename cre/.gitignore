@@ -1,4 +1,4 @@
-# CRE environment
+# CRE environment (single root .env — legacy cre/.env still loaded as fallback if present)
 .env
 *.env
 .env.simulate

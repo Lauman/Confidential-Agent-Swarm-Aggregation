@@ -30,4 +30,12 @@ export const config = {
     ? path.isAbsolute(process.env.STATE_DIR) ? process.env.STATE_DIR : path.resolve(WORKSPACE_ROOT, process.env.STATE_DIR)
     : path.join(os.tmpdir(), 'private-signal-swarm-coordinator'),
   resultIngestUrl: process.env.RESULT_INGEST_URL || undefined,
+  creGatewayUrl: process.env.CRE_GATEWAY_URL || undefined,
+  creWorkflowId: process.env.CRE_WORKFLOW_ID || undefined,
+  coordinatorSigningKey:
+    process.env.COORDINATOR_SIGNING_KEY ||
+    process.env.TRIGGER_PRIVATE_KEY ||
+    process.env.HEDERA_PRIVATE_KEY ||
+    undefined,
+  donTeeEncPub: process.env.DON_TEE_ENC_PUB || undefined,
 };
