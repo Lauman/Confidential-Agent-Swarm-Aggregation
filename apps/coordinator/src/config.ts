@@ -37,5 +37,5 @@ export const config = {
     process.env.TRIGGER_PRIVATE_KEY ||
     process.env.HEDERA_PRIVATE_KEY ||
     undefined,
-  donTeeEncPub: process.env.DON_TEE_ENC_PUB || process.env.CRE_TEE_ENC_PUB || undefined,
+  donTeeEncPub: process.env.DON_TEE_ENC_PUB || undefined,
 };

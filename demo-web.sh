@@ -8,6 +8,11 @@
 set -e
 cd "$(dirname "$0")"
 
+set -a
+[ -f .env ] && . ./.env
+[ -f cre/.env ] && . ./cre/.env
+set +a
+
 require_free_port() {
   if ss -ltn 2>/dev/null | grep -qE ":$1( |$)"; then
     echo " ✗ Port $1 is already in use — stop whatever holds it first (ss -ltnp | grep $1)."
@@ -49,7 +54,7 @@ echo ""
 curl -s http://localhost:3001/health >/dev/null && echo "Coordinator:      ✓ http://localhost:3001/health" || echo "Coordinator:      ✗ NOT UP"
 curl -s http://localhost:3000/api/status >/dev/null && echo "Resource server:  ✓ http://localhost:3000/api/status" || echo "Resource server:  ✗ NOT UP"
 curl -s http://localhost:5173/ >/dev/null && echo "Web UI:           ✓ http://localhost:5173" || echo "Web UI:           ✗ NOT UP"
-if [ -n "${CRE_GATEWAY_URL:-}" ] && [ -n "${CRE_WORKFLOW_ID:-}" ] && [ -n "${DON_TEE_ENC_PUB:-${CRE_TEE_ENC_PUB:-}}" ]; then
+if [ -n "${CRE_GATEWAY_URL:-}" ] && [ -n "${CRE_WORKFLOW_ID:-}" ] && [ -n "${DON_TEE_ENC_PUB:-}" ]; then
   echo "CRE trigger:      ✓ ARMED (Deliberate also fires the deployed DON workflow)"
 else
   echo "CRE trigger:      off (set CRE_GATEWAY_URL, CRE_WORKFLOW_ID, COORDINATOR_SIGNING_KEY, DON_TEE_ENC_PUB to also run each round on the DON)"
