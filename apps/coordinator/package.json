@@ -9,9 +9,14 @@
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist dist-scripts",
+    "build:scripts": "tsc --project tsconfig.scripts.json",
+    "trigger:deployed": "pnpm build:scripts && node dist-scripts/scripts/trigger-deployed.js"
   },
   "dependencies": {
+    "@noble/curves": "^2.4.0",
+    "@noble/hashes": "^2.4.0",
+    "@private-signal-swarm/agent": "workspace:*",
     "@private-signal-swarm/confidential-core": "workspace:*",
     "@private-signal-swarm/types": "workspace:*",
     "express": "^4.18.0",

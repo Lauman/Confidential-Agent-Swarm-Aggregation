@@ -31,7 +31,7 @@ coordinatorRouter.get('/round/current', (req, res) => {
     res.status(400).json({ error: 'unknown-usecase', message: `Missing or unknown ?useCase= (allowed: ${config.allowedUseCases.join(', ')})` });
     return;
   }
-  res.json({ roundId: roundManager.getCurrentRoundId(useCase), useCase });
+  res.json({ ...roundManager.getCurrentRound(useCase) });
 });
 
 coordinatorRouter.post('/submit', async (req, res) => {
@@ -76,4 +76,10 @@ coordinatorRouter.get('/result/latest', (req, res) => {
     return;
   }
   res.json(result);
+});
+
+coordinatorRouter.get('/rounds/recent', (req, res) => {
+  const raw = typeof req.query.limit === 'string' ? parseInt(req.query.limit, 10) : 5;
+  const limit = Number.isFinite(raw) ? Math.min(Math.max(raw, 1), 20) : 5;
+  res.json({ rounds: roundManager.listRecentRounds(limit).map(sanitizeRound) });
 });

@@ -2,10 +2,11 @@ import type {
   BatchRequest,
   EncryptedEnvelope,
   RoundRecord,
+  SubmittedAgent,
   TeeSignedResult,
 } from '@private-signal-swarm/types';
 import { EnvelopeValidationError } from './envelope-validator.js';
-import { computeBatchHash, TombstoneStore } from './tombstone-store.js';
+import { computeBatchHash, computeEnvelopeHash, TombstoneStore } from './tombstone-store.js';
 import type { TeeSeam } from './tee-seam.js';
 
 interface OpenRound {
@@ -13,6 +14,7 @@ interface OpenRound {
   useCase: string;
   quorum: number;
   submissions: Map<string, EncryptedEnvelope>;
+  meta: Map<string, SubmittedAgent>;
   nonces: Set<string>;
 }
 
@@ -56,10 +58,20 @@ export class RoundManager {
       useCase,
       quorum: this.quorum,
       submissions: new Map(),
+      meta: new Map(),
       nonces: new Set(),
     });
     this.currentRoundByUseCase.set(useCase, roundId);
     return roundId;
+  }
+
+  getCurrentRound(useCase: string): RoundRecord {
+    const roundId = this.getCurrentRoundId(useCase);
+    const record = this.getRoundRecord(roundId);
+    if (!record) {
+      throw new Error(`Current round ${roundId} has no record`);
+    }
+    return record;
   }
 
   async handleSubmit(envelope: EncryptedEnvelope): Promise<SubmitOutcome> {
@@ -85,6 +97,11 @@ export class RoundManager {
 
     round.submissions.set(envelope.agentId, envelope);
     round.nonces.add(envelope.nonce);
+    round.meta.set(envelope.agentId, {
+      agentId: envelope.agentId,
+      envelopeHash: computeEnvelopeHash(envelope.ciphertext),
+      submittedAt: Date.now(),
+    });
 
     if (round.submissions.size < round.quorum) {
       return { status: 'accepted', submissionCount: round.submissions.size, quorum: round.quorum };
@@ -94,11 +111,15 @@ export class RoundManager {
     return { status: 'quorum-reached', result };
   }
 
+  private submittedList(round: OpenRound): SubmittedAgent[] {
+    return Array.from(round.meta.values()).sort((a, b) => a.submittedAt - b.submittedAt);
+  }
+
   private async aggregateRound(round: OpenRound): Promise<TeeSignedResult> {
     const envelopes = Array.from(round.submissions.values());
     const batchHash = computeBatchHash({ keyId: this.keyId }, envelopes);
 
-    this.store.closeRound(round.roundId, round.useCase, envelopes.length, batchHash);
+    this.store.closeRound(round.roundId, round.useCase, envelopes.length, batchHash, this.submittedList(round));
     this.openRounds.delete(round.roundId);
     this.currentRoundByUseCase.delete(round.useCase);
 
@@ -133,6 +154,7 @@ export class RoundManager {
         quorum: this.quorum,
         status: 'aggregated',
         submissionCount: closed.submissionCount,
+        submittedAgents: closed.submittedAgents,
         batchHash: closed.batchHash,
         closedAt: closed.closedAt,
       };
@@ -147,10 +169,24 @@ export class RoundManager {
       quorum: open.quorum,
       status: 'collecting',
       submissionCount: open.submissions.size,
+      submittedAgents: this.submittedList(open),
     };
   }
 
   getLatestResult(useCase: string): TeeSignedResult | undefined {
     return this.store.getLatestResult(useCase);
+  }
+
+  listRecentRounds(limit = 5): RoundRecord[] {
+    return this.store.listClosedRounds(limit).map((closed) => ({
+      roundId: closed.roundId,
+      useCase: closed.useCase,
+      quorum: this.quorum,
+      status: 'aggregated' as const,
+      submissionCount: closed.submissionCount,
+      submittedAgents: closed.submittedAgents,
+      batchHash: closed.batchHash,
+      closedAt: closed.closedAt,
+    }));
   }
 }
