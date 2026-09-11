@@ -10,6 +10,26 @@ export interface TeeResultSigningInput {
   payload: unknown;
 }
 
+/**
+ * Deterministic JSON serialization with recursively sorted object keys.
+ * The CRE runtime re-serializes workflow return values (e.g. alphabetical
+ * key order), so signatures must not depend on in-memory insertion order —
+ * otherwise a result signed inside the enclave fails verification after
+ * crossing the CRE transport boundary.
+ */
+export function stableStringify(value: unknown): string {
+  if (value === null || typeof value !== 'object') {
+    return JSON.stringify(value) ?? 'null';
+  }
+  if (Array.isArray(value)) {
+    return `[${value.map((entry) => stableStringify(entry)).join(',')}]`;
+  }
+  const entries = Object.entries(value as Record<string, unknown>)
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+    .map(([key, entry]) => `${JSON.stringify(key)}:${stableStringify(entry)}`);
+  return `{${entries.join(',')}}`;
+}
+
 export function teeResultCanonical(result: TeeResultSigningInput): Uint8Array {
   const canonical = [
     `v${TEE_RESULT_VERSION}`,
@@ -17,7 +37,7 @@ export function teeResultCanonical(result: TeeResultSigningInput): Uint8Array {
     result.roundId,
     String(result.participantCount),
     String(result.timestamp),
-    JSON.stringify(result.payload),
+    stableStringify(result.payload),
   ].join('|');
   return new TextEncoder().encode(canonical);
 }

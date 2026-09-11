@@ -1,9 +1,11 @@
 # CRE environment
 .env
 *.env
+.env.simulate
 
 # Build artifacts
 *.cre_build_tmp.js
+binary.wasm.br.b64
 node_modules/
 
 # CRE state

@@ -11,7 +11,8 @@
     "test": "vitest run",
     "clean": "rm -rf dist dist-scripts",
     "build:scripts": "tsc --project tsconfig.scripts.json",
-    "trigger:deployed": "pnpm build:scripts && node dist-scripts/scripts/trigger-deployed.js"
+    "trigger:deployed": "pnpm build:scripts && node dist-scripts/scripts/trigger-deployed.js",
+    "trigger:live-round": "pnpm build:scripts && node dist-scripts/scripts/trigger-live-round.js"
   },
   "dependencies": {
     "@noble/curves": "^2.4.0",

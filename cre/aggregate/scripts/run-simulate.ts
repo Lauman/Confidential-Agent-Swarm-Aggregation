@@ -7,6 +7,7 @@ import { generateSimulatePayload } from './generate-simulate-payload.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const KEYS_DIR = path.join(ROOT, 'packages/confidential-core/.dev-keys');
+const CRE_DIR = path.join(ROOT, 'cre');
 const CRE_BIN = path.join(process.env.HOME ?? '', '.cre', 'bin', 'cre');
 
 function generateEthPrivateKey(): string {
@@ -21,7 +22,23 @@ async function main() {
     );
   }
 
-  await generateSimulatePayload();
+  // Replay mode: SIMULATE_PAYLOAD_PATH points at a pre-built batch file
+  // (e.g. a live round dumped by the coordinator). Otherwise a fresh
+  // synthetic batch is generated into aggregate/test-payload.json.
+  const replayPath = process.env.SIMULATE_PAYLOAD_PATH;
+  const payloadArg = replayPath
+    ? path.isAbsolute(replayPath)
+      ? replayPath
+      : path.join(ROOT, replayPath)
+    : 'aggregate/test-payload.json';
+  if (replayPath) {
+    if (!fs.existsSync(payloadArg)) {
+      throw new Error(`SIMULATE_PAYLOAD_PATH not found: ${payloadArg}`);
+    }
+    console.log(`Simulate replay payload: ${payloadArg}`);
+  } else {
+    await generateSimulatePayload();
+  }
 
   const secrets = JSON.parse(
     fs.readFileSync(path.join(KEYS_DIR, 'dev-secrets.json'), 'utf-8')
@@ -36,6 +53,21 @@ async function main() {
   // Random ETH key for simulation when the workflow needs one and none is set.
   const ethPrivateKey = process.env.CRE_ETH_PRIVATE_KEY || generateEthPrivateKey();
 
+  // The CLI resolves workflow secrets (cre/secrets.yaml) from an env file,
+  // and a stale cre/.env silently overrides process env — so always write a
+  // fresh env file from the current dev keys and pass it explicitly with -e.
+  // This keeps simulate hermetic across key rotations.
+  const envFile = path.join(CRE_DIR, '.env.simulate');
+  fs.writeFileSync(
+    envFile,
+    [
+      `CRE_ETH_PRIVATE_KEY=${ethPrivateKey}`,
+      `CRE_TEE_ENC_PUB=${secrets.tee.publicKey}`,
+      `CRE_TEE_ENC_PRIV=${secrets.tee.encPriv}`,
+      `CRE_TEE_SIGN_PRIV=${secrets.tee.signPriv}`,
+    ].join('\n') + '\n'
+  );
+
   const result = spawnSync(
     CRE_BIN,
     [
@@ -43,10 +75,11 @@ async function main() {
       '--target', target,
       '--non-interactive',
       '--trigger-index', '0',
-      '--http-payload', 'aggregate/test-payload.json',
+      '--http-payload', payloadArg,
+      '-e', envFile,
     ],
     {
-      cwd: path.join(ROOT, 'cre'),
+      cwd: CRE_DIR,
       stdio: 'inherit',
       env: {
         ...process.env,

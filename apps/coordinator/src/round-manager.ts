@@ -5,6 +5,8 @@ import type {
   SubmittedAgent,
   TeeSignedResult,
 } from '@private-signal-swarm/types';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { EnvelopeValidationError } from './envelope-validator.js';
 import { computeBatchHash, computeEnvelopeHash, TombstoneStore } from './tombstone-store.js';
 import type { TeeSeam } from './tee-seam.js';
@@ -129,6 +131,18 @@ export class RoundManager {
       keyId: this.keyId,
       envelopes,
     };
+
+    // Debug-only escape hatch for end-to-end CRE probes: dump the exact
+    // batch handed to the TEE seam so `cre workflow simulate` can replay the
+    // live round. OFF by default — the coordinator stays blind otherwise.
+    // Never set COORDINATOR_DEBUG_DUMP_DIR in production.
+    const dumpDir = process.env.COORDINATOR_DEBUG_DUMP_DIR;
+    if (dumpDir) {
+      fs.mkdirSync(dumpDir, { recursive: true });
+      const dumpPath = path.join(dumpDir, `${round.roundId}.batch.json`);
+      fs.writeFileSync(dumpPath, JSON.stringify(batch, null, 2));
+      console.log(`[coordinator] debug batch dumped: ${dumpPath}`);
+    }
 
     const result = await this.teeSeam.process(
       {
