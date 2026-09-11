@@ -35,6 +35,10 @@ export function fetchVerdict(useCase: string): Promise<VerdictView | null> {
   return getJson<VerdictView>(`${RESOURCE}/api/verdict?useCase=${encodeURIComponent(useCase)}`);
 }
 
+export function fetchLocalTeePub(): Promise<{ keyId: string; signPub: string } | null> {
+  return getJson<{ keyId: string; signPub: string }>(`${RESOURCE}/api/tee-pub`);
+}
+
 export async function runDemoRound(
   proposalRef: string
 ): Promise<{ ok: boolean; message: string }> {

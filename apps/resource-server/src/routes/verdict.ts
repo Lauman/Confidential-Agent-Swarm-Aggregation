@@ -22,6 +22,11 @@ verdictRouter.get('/status', (_req, res) => {
   res.json({ available: requireStore().status() });
 });
 
+verdictRouter.get('/tee-pub', (_req, res) => {
+  const store = requireStore();
+  res.json({ keyId: store.currentKeyId, signPub: store.teePub });
+});
+
 /** Push from the coordinator. The TEE signature IS the auth — verify at intake. */
 verdictRouter.post('/internal/ingest', async (req, res) => {
   try {

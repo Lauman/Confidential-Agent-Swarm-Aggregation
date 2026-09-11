@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   fetchCurrentRound,
+  fetchLocalTeePub,
   fetchRecentRounds,
   fetchStatus,
   fetchVerdict,
@@ -90,7 +91,20 @@ export default function App() {
             setTeeKey(key);
           }
         }
-        if (!key) {
+        if (key && verifyVerdictSignature(v, key)) {
+          if (mounted.current) {
+            setVerifiedRounds((m) => ({ ...m, [v.roundId]: true }));
+          }
+          return true;
+        }
+        const local = await fetchLocalTeePub();
+        if (local?.signPub && verifyVerdictSignature(v, local.signPub)) {
+          if (mounted.current) {
+            setVerifiedRounds((m) => ({ ...m, [v.roundId]: true }));
+          }
+          return true;
+        }
+        if (!key && !local?.signPub) {
           if (mounted.current) {
             setVerifyError(
               'TEE key unreachable (keys.bombus.eth via Sepolia). Check connection and retry.'
@@ -98,15 +112,10 @@ export default function App() {
           }
           return false;
         }
-        const ok = verifyVerdictSignature(v, key);
         if (mounted.current) {
-          if (ok) {
-            setVerifiedRounds((m) => ({ ...m, [v.roundId]: true }));
-          } else {
-            setVerifyError('Signature mismatch — do not trust this verdict.');
-          }
+          setVerifyError('Signature mismatch — do not trust this verdict.');
         }
-        return ok;
+        return false;
       } finally {
         if (mounted.current) {
           setVerifying(false);
