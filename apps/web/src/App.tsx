@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   fetchCurrentRound,
+  fetchDemoActive,
   fetchLocalTeePub,
   fetchRecentRounds,
   fetchStatus,
@@ -66,9 +67,16 @@ export default function App() {
   const [verifying, setVerifying] = useState(false);
   const [verifyError, setVerifyError] = useState<string | null>(null);
   const [teeKey, setTeeKey] = useState<string | null>(null);
+  const [deliberatingRoundId, setDeliberatingRoundId] = useState<string | null>(null);
   const seenRound = useRef<string | null>(null);
   const failures = useRef(0);
   const mounted = useRef(true);
+  const deliberatingRef = useRef<string | null>(null);
+  const deliberateTimer = useRef<number | undefined>(undefined);
+
+  useEffect(() => {
+    deliberatingRef.current = deliberatingRoundId;
+  }, [deliberatingRoundId]);
 
   useEffect(() => {
     mounted.current = true;
@@ -151,7 +159,18 @@ export default function App() {
       failures.current = 0;
       setReachable(true);
       if (current) {
-        setRound(current);
+        setRound((prev) => {
+          if (
+            prev &&
+            prev.submissionCount > 0 &&
+            current.submissionCount === 0 &&
+            current.roundId !== prev.roundId &&
+            deliberatingRef.current
+          ) {
+            return prev;
+          }
+          return current;
+        });
       }
       setStatusEntries(status);
       setFeed(recent);
@@ -162,12 +181,38 @@ export default function App() {
         if (v && mounted.current) {
           seenRound.current = v.roundId;
           setVerdict(v);
+          if (deliberatingRef.current && v.roundId === deliberatingRef.current) {
+            setDeliberatingRoundId(null);
+          }
+        }
+      }
+      if (deliberatingRef.current && deliberatingRef.current !== 'pending') {
+        const done = recent.some((r) => r.roundId === deliberatingRef.current);
+        if (done && available?.roundId === deliberatingRef.current) {
+          const v = await fetchVerdict(USE_CASE);
+          if (v && mounted.current && v.roundId === deliberatingRef.current) {
+            seenRound.current = v.roundId;
+            setVerdict(v);
+            setDeliberatingRoundId(null);
+          }
+        }
+      }
+      if (deliberatingRef.current) {
+        const demo = await fetchDemoActive(USE_CASE);
+        if (mounted.current && !demo.active && available) {
+          const v = await fetchVerdict(USE_CASE);
+          if (v && v.roundId === deliberatingRef.current) {
+            seenRound.current = v.roundId;
+            setVerdict(v);
+            setDeliberatingRoundId(null);
+          }
         }
       }
     };
 
     void tick();
-    const timer = setInterval(() => void tick(), 1200);
+    const intervalMs = deliberatingRoundId ? 400 : 1200;
+    const timer = setInterval(() => void tick(), intervalMs);
     const onVis = () => {
       if (!document.hidden) {
         void tick();
@@ -175,9 +220,16 @@ export default function App() {
     };
     document.addEventListener('visibilitychange', onVis);
     return () => {
-      mounted.current = false;
       clearInterval(timer);
       document.removeEventListener('visibilitychange', onVis);
+    };
+  }, [deliberatingRoundId]);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      window.clearTimeout(deliberateTimer.current);
     };
   }, []);
 
@@ -195,12 +247,25 @@ export default function App() {
     }
     setBusy(true);
     setNotice(null);
+    setDeliberatingRoundId('pending');
+    window.clearTimeout(deliberateTimer.current);
+    deliberateTimer.current = window.setTimeout(() => {
+      if (mounted.current) {
+        setDeliberatingRoundId(null);
+      }
+    }, 30_000);
     const result = await runDemoRound(ref);
     if (!mounted.current) {
       return;
     }
     setNotice({ text: result.message, tone: result.ok ? 'info' : 'error' });
     setBusy(false);
+    if (result.ok && result.roundId) {
+      setDeliberatingRoundId(result.roundId);
+    } else if (!result.ok) {
+      setDeliberatingRoundId(null);
+      window.clearTimeout(deliberateTimer.current);
+    }
   }
 
   const noticeRef = useRef<HTMLParagraphElement | null>(null);
@@ -213,6 +278,7 @@ export default function App() {
 
   const slots = round ? Array.from({ length: Math.max(round.quorum, 0) }) : [];
   const filled = round ? (round.submittedAgents ?? []) : [];
+  const deliberating = deliberatingRoundId !== null;
   const verdictKind = verdict?.payload.verdict;
   const revealed = verdict && verdictKind && verifiedRounds[verdict.roundId] === true;
   const activeProposal = findProposal(proposalRef);
@@ -276,8 +342,8 @@ export default function App() {
               placeholder="dao-grants-007…"
               spellCheck={false}
             />
-            <button type="button" className="deliberate" disabled={busy || !proposalRef.trim()} onClick={deliberate}>
-              {busy ? 'Deliberating…' : 'Deliberate'}
+            <button type="button" className="deliberate" disabled={busy || deliberating || !proposalRef.trim()} onClick={deliberate} aria-live="polite">
+              {busy || deliberating ? 'Deliberating…' : 'Deliberate'}
             </button>
           </div>
 
@@ -311,8 +377,12 @@ export default function App() {
                       </div>
                     </div>
                   ) : (
-                    <div className="slot ghost" key={`ghost-${i}`}>
-                      awaiting agent
+                    <div
+                      className={`slot ghost${deliberating ? ' deliberating' : ''}`}
+                      key={`ghost-${i}`}
+                      aria-live="polite"
+                    >
+                      {deliberating ? 'deliberating…' : 'awaiting agent'}
                     </div>
                   );
                 })}
@@ -333,7 +403,8 @@ export default function App() {
                 />
               </div>
               <div className="quorumlabel" translate="no">
-                {round.submissionCount}/{round.quorum} sealed · {round.status} · {round.roundId}
+                {round.submissionCount}/{round.quorum} sealed ·{' '}
+                {deliberating ? 'deliberating' : round.status} · {round.roundId}
               </div>
             </>
           ) : (

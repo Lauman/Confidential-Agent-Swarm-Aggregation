@@ -1,4 +1,4 @@
-import type { RoundView, StatusEntry, VerdictView } from './types.js';
+import type { DemoActiveState, DemoStartResult, RoundView, StatusEntry, VerdictView } from './types.js';
 
 const COORD = '/api/coordinator';
 const RESOURCE = '/api/resource';
@@ -39,14 +39,18 @@ export function fetchLocalTeePub(): Promise<{ keyId: string; signPub: string } |
   return getJson<{ keyId: string; signPub: string }>(`${RESOURCE}/api/tee-pub`);
 }
 
-export async function runDemoRound(
-  proposalRef: string
-): Promise<{ ok: boolean; message: string }> {
+export function fetchDemoActive(useCase: string): Promise<DemoActiveState> {
+  return getJson<DemoActiveState>(`${COORD}/api/demo/active?useCase=${encodeURIComponent(useCase)}`).then(
+    (body) => body ?? { active: false }
+  );
+}
+
+export async function runDemoRound(proposalRef: string): Promise<DemoStartResult> {
   try {
     const res = await fetch(`${COORD}/api/demo/run-round`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ proposalRef, useCase: 'deliberation' }),
+      body: JSON.stringify({ proposalRef, useCase: 'deliberation', staggerMs: 800 }),
     });
     if (res.status === 404) {
       return {
@@ -58,7 +62,8 @@ export async function runDemoRound(
       const body = (await res.json().catch(() => null)) as { message?: string } | null;
       return { ok: false, message: body?.message ?? `Coordinator refused (${res.status}).` };
     }
-    return { ok: true, message: 'Round running — watch the slots fill.' };
+    const body = (await res.json().catch(() => null)) as { roundId?: string } | null;
+    return { ok: true, message: 'Round running — watch the slots fill.', roundId: body?.roundId };
   } catch {
     return { ok: false, message: 'Coordinator unreachable at :3001 — is it running?' };
   }

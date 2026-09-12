@@ -379,6 +379,17 @@ button {
   font-size: 0.78rem;
 }
 
+.slot.ghost.deliberating {
+  border-color: var(--amber-deep);
+  color: var(--amber);
+  animation: deliberate-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes deliberate-pulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
 .quorumbar {
   height: 8px;
   background: var(--ink);
@@ -605,7 +616,8 @@ button {
 @media (prefers-reduced-motion: reduce) {
   .verdict-enter,
   .load-in,
-  .quorumbar > div {
+  .quorumbar > div,
+  .slot.ghost.deliberating {
     animation: none;
     transition: none;
   }

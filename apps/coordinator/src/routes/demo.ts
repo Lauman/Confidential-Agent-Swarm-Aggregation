@@ -11,11 +11,23 @@ const USE_CASE_ARGS: Record<string, UseCaseId> = {
   'signal-estimate': USE_CASES.signalEstimate,
 };
 
+function resolveUseCase(arg: string): UseCaseId | undefined {
+  const alias = USE_CASE_ARGS[arg];
+  if (alias) {
+    return alias;
+  }
+  const values = Object.values(USE_CASES) as string[];
+  return values.includes(arg) ? (arg as UseCaseId) : undefined;
+}
+
+const activeDemoByUseCase = new Map<string, { roundId: string; startedAt: number; proposalRef: string }>();
+
 /**
  * Demo theater endpoint (hackathon UI only — not part of the protocol).
  * Runs one full swarm round in-process and returns the per-agent outcomes.
- * The UI's Deliberate button calls this; polling /round/current remains the
- * source of truth either way.
+ * Submits are staggered so polling /round/current observes 1/N → quorum
+ * while this request is still pending. The UI's Deliberate button calls this;
+ * polling /round/current remains the source of truth either way.
  */
 demoRouter.post('/api/demo/run-round', async (req, res) => {
   try {
@@ -24,19 +36,24 @@ demoRouter.post('/api/demo/run-round', async (req, res) => {
         ? req.body.proposalRef
         : `proposal-${Date.now().toString(36)}`;
     const useCaseArg = typeof req.body?.useCase === 'string' ? req.body.useCase : 'deliberation';
-    const useCase = USE_CASE_ARGS[useCaseArg];
-    if (!useCase) {
+    const resolvedUseCase = resolveUseCase(useCaseArg);
+    if (!resolvedUseCase) {
       res.status(400).json({ error: 'unknown-usecase', message: `Allowed: ${Object.keys(USE_CASE_ARGS).join(', ')}` });
       return;
     }
+    const rawStagger = typeof req.body?.staggerMs === 'number' ? req.body.staggerMs : 800;
+    const staggerMs = Number.isFinite(rawStagger) ? Math.min(Math.max(rawStagger, 0), 5000) : 800;
 
     // Self-URL derived from the incoming request (not config.port), so this
     // works behind proxies and on ephemeral test ports alike.
+    const coordinatorEndpoint = `${req.protocol}://${req.get('host')}`;
+    activeDemoByUseCase.set(resolvedUseCase, { roundId: 'pending', startedAt: Date.now(), proposalRef });
     const result = await runSwarmRound({
-      coordinatorEndpoint: `${req.protocol}://${req.get('host')}`,
+      coordinatorEndpoint,
       keymapPath: config.keymapPath,
       proposalRef,
-      useCase,
+      useCase: resolvedUseCase,
+      staggerMs,
       // In-process agents inherit the server's reasoning config, so the UI's
       // Deliberate button deliberates for real when the server has LLM_API_KEY.
       reasoning: {
@@ -47,11 +64,42 @@ demoRouter.post('/api/demo/run-round', async (req, res) => {
         model: process.env.LLM_MODEL || 'gemini-3.6-flash',
         timeoutMs: process.env.LLM_TIMEOUT_MS ? parseInt(process.env.LLM_TIMEOUT_MS, 10) : undefined,
       },
+      onProgress: (_agentId, _index) => {
+        const active = activeDemoByUseCase.get(resolvedUseCase);
+        if (active && active.roundId === 'pending') {
+          active.startedAt = Date.now();
+        }
+      },
     });
+    activeDemoByUseCase.set(resolvedUseCase, {
+      roundId: result.roundId ?? 'done',
+      startedAt: Date.now(),
+      proposalRef,
+    });
+    setTimeout(() => {
+      const active = activeDemoByUseCase.get(resolvedUseCase);
+      if (active && Date.now() - active.startedAt >= 30_000) {
+        activeDemoByUseCase.delete(resolvedUseCase);
+      }
+    }, 30_000).unref?.();
     res.json({ status: 'ok', ...result });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Demo round failed';
     console.error(`Demo round failed: ${message}`);
     res.status(500).json({ error: 'internal', message });
   }
+});
+
+demoRouter.get('/api/demo/active', (req, res) => {
+  const useCaseArg = typeof req.query.useCase === 'string' ? req.query.useCase : '';
+  const useCase = resolveUseCase(useCaseArg) ?? useCaseArg;
+  const active = activeDemoByUseCase.get(useCase);
+  if (!active || Date.now() - active.startedAt > 30_000) {
+    if (active) {
+      activeDemoByUseCase.delete(useCase);
+    }
+    res.json({ active: false });
+    return;
+  }
+  res.json({ active: true, ...active, useCase });
 });
