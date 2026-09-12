@@ -30,11 +30,23 @@ demoRouter.post('/api/demo/run-round', async (req, res) => {
       return;
     }
 
+    // Self-URL derived from the incoming request (not config.port), so this
+    // works behind proxies and on ephemeral test ports alike.
     const result = await runSwarmRound({
-      coordinatorEndpoint: `http://localhost:${config.port}`,
+      coordinatorEndpoint: `${req.protocol}://${req.get('host')}`,
       keymapPath: config.keymapPath,
       proposalRef,
       useCase,
+      // In-process agents inherit the server's reasoning config, so the UI's
+      // Deliberate button deliberates for real when the server has LLM_API_KEY.
+      reasoning: {
+        mode: process.env.AGENT_REASONING === 'llm' ? 'llm' : 'mock',
+        baseUrl:
+          process.env.LLM_BASE_URL || 'https://generativelanguage.googleapis.com/v1beta/openai/',
+        apiKey: process.env.LLM_API_KEY || undefined,
+        model: process.env.LLM_MODEL || 'gemini-3.6-flash',
+        timeoutMs: process.env.LLM_TIMEOUT_MS ? parseInt(process.env.LLM_TIMEOUT_MS, 10) : undefined,
+      },
     });
     res.json({ status: 'ok', ...result });
   } catch (error) {

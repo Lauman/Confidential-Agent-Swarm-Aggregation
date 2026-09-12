@@ -83,11 +83,20 @@ async function main(): Promise<void> {
     );
   }
 
-  const keymapPath =
-    process.env.KEYMAP_PATH || path.join(ROOT, 'packages/confidential-core/.dev-keys/keymap.json');
-  const secretsPath =
-    process.env.DEV_SECRETS_PATH ||
-    path.join(ROOT, 'packages/confidential-core/.dev-keys/dev-secrets.json');
+  const resolveFromRoot = (p: string | undefined, fallback: string): string => {
+    if (!p) {
+      return fallback;
+    }
+    return path.isAbsolute(p) ? p : path.join(ROOT, p);
+  };
+  const keymapPath = resolveFromRoot(
+    process.env.KEYMAP_PATH,
+    path.join(ROOT, 'packages/confidential-core/.dev-keys/keymap.json')
+  );
+  const secretsPath = resolveFromRoot(
+    process.env.DEV_SECRETS_PATH,
+    path.join(ROOT, 'packages/confidential-core/.dev-keys/dev-secrets.json')
+  );
   if (!fs.existsSync(keymapPath) || !fs.existsSync(secretsPath)) {
     throw new Error(
       `Missing dev keys at ${path.dirname(keymapPath)}. Run: pnpm --filter @private-signal-swarm/confidential-core keygen`
