@@ -1,15 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   fetchCurrentRound,
+  fetchDemoActive,
   fetchLocalTeePub,
   fetchRecentRounds,
   fetchStatus,
   fetchVerdict,
+  resetDemoRound,
   runDemoRound,
 } from './api.js';
 import { agentEnsName, readTeeSignPub } from './ens.js';
 import { verifyVerdictSignature } from './verify.js';
-import { assignPersona } from '@private-signal-swarm/confidential-core';
+import { assignPersona, theaterScript, type TheaterLine } from '@private-signal-swarm/confidential-core';
 import { findProposal } from './data/proposals.js';
 import {
   CHECKPOINT_TX,
@@ -66,9 +68,24 @@ export default function App() {
   const [verifying, setVerifying] = useState(false);
   const [verifyError, setVerifyError] = useState<string | null>(null);
   const [teeKey, setTeeKey] = useState<string | null>(null);
+  const [deliberatingRoundId, setDeliberatingRoundId] = useState<string | null>(null);
+  const [theater, setTheater] = useState<TheaterLine[]>([]);
+  const [theaterVisible, setTheaterVisible] = useState(0);
+  const [pinnedRoundId, setPinnedRoundId] = useState<string | null>(null);
   const seenRound = useRef<string | null>(null);
   const failures = useRef(0);
   const mounted = useRef(true);
+  const deliberatingRef = useRef<string | null>(null);
+  const pinnedRef = useRef<string | null>(null);
+  const deliberateTimer = useRef<number | undefined>(undefined);
+
+  useEffect(() => {
+    deliberatingRef.current = deliberatingRoundId;
+  }, [deliberatingRoundId]);
+
+  useEffect(() => {
+    pinnedRef.current = pinnedRoundId;
+  }, [pinnedRoundId]);
 
   useEffect(() => {
     mounted.current = true;
@@ -150,8 +167,33 @@ export default function App() {
       }
       failures.current = 0;
       setReachable(true);
-      if (current) {
-        setRound(current);
+      const deliberatingId = deliberatingRef.current;
+      const pinned = pinnedRef.current;
+      const pinnedMatch = pinned ? recent.find((r) => r.roundId === pinned) : undefined;
+      const closedMatch =
+        deliberatingId && deliberatingId !== 'pending'
+          ? recent.find((r) => r.roundId === deliberatingId)
+          : undefined;
+      if (pinnedMatch) {
+        setRound(pinnedMatch);
+      } else if (closedMatch) {
+        setRound(closedMatch);
+        if (mounted.current && pinnedRef.current !== closedMatch.roundId) {
+          setPinnedRoundId(closedMatch.roundId);
+        }
+      } else if (current) {
+        setRound((prev) => {
+          if (
+            prev &&
+            prev.submissionCount > 0 &&
+            current.submissionCount === 0 &&
+            current.roundId !== prev.roundId &&
+            deliberatingId
+          ) {
+            return prev;
+          }
+          return current;
+        });
       }
       setStatusEntries(status);
       setFeed(recent);
@@ -162,12 +204,41 @@ export default function App() {
         if (v && mounted.current) {
           seenRound.current = v.roundId;
           setVerdict(v);
+          setPinnedRoundId(v.roundId);
+          if (deliberatingRef.current && v.roundId === deliberatingRef.current) {
+            setDeliberatingRoundId(null);
+          }
+        }
+      }
+      if (deliberatingRef.current && deliberatingRef.current !== 'pending') {
+        const done = recent.some((r) => r.roundId === deliberatingRef.current);
+        if (done && available?.roundId === deliberatingRef.current) {
+          const v = await fetchVerdict(USE_CASE);
+          if (v && mounted.current && v.roundId === deliberatingRef.current) {
+            seenRound.current = v.roundId;
+            setVerdict(v);
+            setPinnedRoundId(v.roundId);
+            setDeliberatingRoundId(null);
+          }
+        }
+      }
+      if (deliberatingRef.current) {
+        const demo = await fetchDemoActive(USE_CASE);
+        if (mounted.current && !demo.active && available) {
+          const v = await fetchVerdict(USE_CASE);
+          if (v && v.roundId === deliberatingRef.current) {
+            seenRound.current = v.roundId;
+            setVerdict(v);
+            setPinnedRoundId(v.roundId);
+            setDeliberatingRoundId(null);
+          }
         }
       }
     };
 
     void tick();
-    const timer = setInterval(() => void tick(), 1200);
+    const intervalMs = deliberatingRoundId ? 400 : 1200;
+    const timer = setInterval(() => void tick(), intervalMs);
     const onVis = () => {
       if (!document.hidden) {
         void tick();
@@ -175,11 +246,36 @@ export default function App() {
     };
     document.addEventListener('visibilitychange', onVis);
     return () => {
-      mounted.current = false;
       clearInterval(timer);
       document.removeEventListener('visibilitychange', onVis);
     };
+  }, [deliberatingRoundId]);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      window.clearTimeout(deliberateTimer.current);
+    };
   }, []);
+
+  useEffect(() => {
+    if (!deliberatingRoundId || theater.length === 0) {
+      return;
+    }
+    setTheaterVisible(0);
+    const cap = theater.filter((l) => l.phase !== 'sealed').length || theater.length;
+    const timer = window.setInterval(() => {
+      setTheaterVisible((v) => {
+        if (v >= cap) {
+          window.clearInterval(timer);
+          return v;
+        }
+        return v + 1;
+      });
+    }, 900);
+    return () => window.clearInterval(timer);
+  }, [deliberatingRoundId, theater.length]);
 
   // Auto-prove each new verdict: belief follows evidence, never precedes it.
   useEffect(() => {
@@ -195,13 +291,49 @@ export default function App() {
     }
     setBusy(true);
     setNotice(null);
+    setPinnedRoundId(null);
+    setTheater(theaterScript(['agent-1', 'agent-2', 'agent-3'], ref));
+    setTheaterVisible(0);
+    setDeliberatingRoundId('pending');
+    window.clearTimeout(deliberateTimer.current);
+    deliberateTimer.current = window.setTimeout(() => {
+      if (mounted.current) {
+        setDeliberatingRoundId(null);
+      }
+    }, 30_000);
     const result = await runDemoRound(ref);
     if (!mounted.current) {
       return;
     }
     setNotice({ text: result.message, tone: result.ok ? 'info' : 'error' });
     setBusy(false);
+    if (result.ok && result.roundId) {
+      setDeliberatingRoundId(result.roundId);
+    } else if (!result.ok) {
+      setDeliberatingRoundId(null);
+      window.clearTimeout(deliberateTimer.current);
+    }
   }
+
+  async function resetStuckRound() {
+    if (busy) {
+      return;
+    }
+    setBusy(true);
+    const result = await resetDemoRound();
+    if (mounted.current) {
+      setNotice({ text: result.message, tone: result.ok ? 'info' : 'error' });
+      setTheater([]);
+      setTheaterVisible(0);
+      setPinnedRoundId(null);
+      setRound(null);
+      setBusy(false);
+    }
+  }
+
+  const showReset =
+    notice?.tone === 'error' &&
+    /already submitted|already running|stuck|failed|refused/i.test(notice.text);
 
   const noticeRef = useRef<HTMLParagraphElement | null>(null);
 
@@ -213,6 +345,29 @@ export default function App() {
 
   const slots = round ? Array.from({ length: Math.max(round.quorum, 0) }) : [];
   const filled = round ? (round.submittedAgents ?? []) : [];
+  const deliberating = deliberatingRoundId !== null;
+  // Theater is gated on real ballot state: a "sealed ✓" line only renders
+  // once that agent's balloon shows sealed. Pre-seal chatter still types out
+  // progressively; sealed lines appear exactly when the coordinator confirms.
+  const sealedIds: Set<string> = (() => {
+    if (theater.length === 0) {
+      return new Set();
+    }
+    if (deliberatingRoundId === 'pending') {
+      return new Set();
+    }
+    if (deliberatingRoundId) {
+      return round?.roundId === deliberatingRoundId
+        ? new Set(filled.map((a) => a.agentId))
+        : new Set();
+    }
+    return new Set(filled.map((a) => a.agentId));
+  })();
+  const visibleTheater: TheaterLine[] = (() => {
+    const pre = theater.filter((l) => l.phase !== 'sealed').slice(0, Math.max(theaterVisible, 1));
+    const sealed = theater.filter((l) => l.phase === 'sealed' && sealedIds.has(l.agentId));
+    return [...pre, ...sealed];
+  })();
   const verdictKind = verdict?.payload.verdict;
   const revealed = verdict && verdictKind && verifiedRounds[verdict.roundId] === true;
   const activeProposal = findProposal(proposalRef);
@@ -276,14 +431,19 @@ export default function App() {
               placeholder="dao-grants-007…"
               spellCheck={false}
             />
-            <button type="button" className="deliberate" disabled={busy || !proposalRef.trim()} onClick={deliberate}>
-              {busy ? 'Deliberating…' : 'Deliberate'}
+            <button type="button" className="deliberate" disabled={busy || deliberating || !proposalRef.trim()} onClick={deliberate} aria-live="polite">
+              {busy || deliberating ? 'Deliberating…' : 'Deliberate'}
             </button>
           </div>
 
           {notice && (
             <p className="notice" role="status" tabIndex={-1} ref={noticeRef}>
-              {notice.text}
+              {notice.text}{' '}
+              {showReset && (
+                <button type="button" className="mini" disabled={busy} onClick={() => void resetStuckRound()}>
+                  Start fresh
+                </button>
+              )}
             </p>
           )}
 
@@ -311,8 +471,12 @@ export default function App() {
                       </div>
                     </div>
                   ) : (
-                    <div className="slot ghost" key={`ghost-${i}`}>
-                      awaiting agent
+                    <div
+                      className={`slot ghost${deliberating ? ' deliberating' : ''}`}
+                      key={`ghost-${i}`}
+                      aria-live="polite"
+                    >
+                      {deliberating ? 'deliberating…' : 'awaiting agent'}
                     </div>
                   );
                 })}
@@ -333,13 +497,36 @@ export default function App() {
                 />
               </div>
               <div className="quorumlabel" translate="no">
-                {round.submissionCount}/{round.quorum} sealed · {round.status} · {round.roundId}
+                {round.submissionCount}/{round.quorum} sealed ·{' '}
+                {deliberating ? 'deliberating' : round.status} · {round.roundId}
               </div>
             </>
           ) : (
             <div className="empty-state">
               No open round yet. Pick a proposal above and press Deliberate — the swarm's first
               round opens and these slots start filling.
+            </div>
+          )}
+
+          {theater.length > 0 && (
+            <div className="theater" aria-live="polite" aria-label="Live deliberation dramatization">
+              <div className="theater-head">
+                Live deliberation · dramatization — ballots stay sealed
+              </div>
+              <ul>
+                {visibleTheater.map((line, i, arr) => (
+                  <li
+                    key={`${line.agentId}-${line.phase}-${i}`}
+                    className={`${i === arr.length - 1 && deliberating ? 'latest' : ''}${line.phase === 'sealed' ? ' t-sealed' : ''}`}
+                  >
+                    <span className="t-persona" translate="no" title={line.agentId}>
+                      {line.persona} · {line.agentId.replace('agent-', 'a')}
+                      {line.phase === 'sealed' ? ' · sealed' : ''}
+                    </span>
+                    <span className="t-text">{line.text}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 

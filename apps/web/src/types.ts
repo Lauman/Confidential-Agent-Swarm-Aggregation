@@ -38,6 +38,19 @@ export interface StatusEntry {
   participantCount: number;
 }
 
+export interface DemoStartResult {
+  ok: boolean;
+  message: string;
+  roundId?: string;
+}
+
+export interface DemoActiveState {
+  active: boolean;
+  roundId?: string;
+  proposalRef?: string;
+  startedAt?: number;
+}
+
 export const PRESET_PROPOSALS = [
   { ref: 'dao-grants-007', label: 'Grants round 7', expect: 'pass' as VerdictKind },
   { ref: 'dao-treasury-001', label: 'Treasury rebalance', expect: 'fail' as VerdictKind },

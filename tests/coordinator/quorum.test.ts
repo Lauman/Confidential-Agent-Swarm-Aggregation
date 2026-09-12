@@ -208,6 +208,57 @@ describe('EnvelopeValidationError codes', () => {
   });
 });
 
+describe('fresh rounds + reset (demo theater recovery)', () => {
+  it('mints a fresh round per demo run so retries never re-pin a dirty round', async () => {
+    const manager = makeManager(makeStore());
+    const first = manager.getCurrentRoundId(USE_CASES.deliberation);
+    await manager.handleSubmit(
+      await makeEnvelope(0, first, { proposalRef: 'p', vote: 'support', confidence: 0.9 })
+    );
+
+    const fresh = manager.createFreshRoundId(USE_CASES.deliberation);
+    expect(fresh).not.toBe(first);
+    expect(manager.getCurrentRoundId(USE_CASES.deliberation)).toBe(fresh);
+    // retry on the fresh round works: same agent can submit there
+    expect(
+      (await manager.handleSubmit(
+        await makeEnvelope(0, fresh, { proposalRef: 'p', vote: 'support', confidence: 0.9 })
+      )).status
+    ).toBe('accepted');
+  });
+
+  it('abandons a stuck partial round and mints a fresh one', async () => {
+    const manager = makeManager(makeStore());
+    const stuck = manager.getCurrentRoundId(USE_CASES.deliberation);
+    await manager.handleSubmit(
+      await makeEnvelope(0, stuck, { proposalRef: 'p', vote: 'support', confidence: 0.9 })
+    );
+
+    const { abandoned, fresh } = manager.abandonCurrentRound(USE_CASES.deliberation);
+    expect(abandoned).toBe(stuck);
+    expect(fresh).not.toBe(stuck);
+    expect(manager.getRoundRecord(stuck)).toBeUndefined();
+    expect(manager.getCurrentRound(USE_CASES.deliberation).roundId).toBe(fresh);
+    expect(manager.getCurrentRound(USE_CASES.deliberation).submissionCount).toBe(0);
+  });
+
+  it('a quorum close never wipes a newer round created concurrently', async () => {
+    const manager = makeManager(makeStore());
+    const old = manager.getCurrentRoundId(USE_CASES.deliberation);
+    await manager.handleSubmit(
+      await makeEnvelope(0, old, { proposalRef: 'p', vote: 'support', confidence: 0.9 })
+    );
+    await manager.handleSubmit(
+      await makeEnvelope(1, old, { proposalRef: 'p', vote: 'support', confidence: 0.9 })
+    );
+    const newer = manager.createFreshRoundId(USE_CASES.deliberation);
+    await manager.handleSubmit(
+      await makeEnvelope(2, old, { proposalRef: 'p', vote: 'support', confidence: 0.9 })
+    );
+    expect(manager.getCurrentRoundId(USE_CASES.deliberation)).toBe(newer);
+  });
+});
+
 describe('submittedAgents (UI swarm feed)', () => {
   it('exposes quorum, empty list, and growing metadata on the current round', async () => {
     const manager = makeManager(makeStore());

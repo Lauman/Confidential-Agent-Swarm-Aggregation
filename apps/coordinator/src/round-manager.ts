@@ -57,6 +57,17 @@ export class RoundManager {
     if (existing && !this.store.isClosed(existing) && this.openRounds.has(existing)) {
       return existing;
     }
+    return this.createFreshRoundId(useCase);
+  }
+
+  /**
+   * Always mints a new open round and points the useCase at it. Used by the
+   * demo theater endpoint so a retry never re-pins a dirty partial round
+   * (e.g. one holding a stray agent-1 submit) and deadlocks on
+   * already-submitted. Superseded partial rounds stay open (not deleted) so
+   * in-flight real submissions to the old roundId still validate.
+   */
+  createFreshRoundId(useCase: string): string {
     const roundId = `round-${useCase}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
     this.openRounds.set(roundId, {
       roundId,
@@ -68,6 +79,22 @@ export class RoundManager {
     });
     this.currentRoundByUseCase.set(useCase, roundId);
     return roundId;
+  }
+
+  /**
+   * Theater-only recovery: drops the current open round (e.g. stuck at 1/3
+   * after a failed demo run) and mints a fresh one. Never touches tombstoned
+   * closed rounds or results.
+   */
+  abandonCurrentRound(useCase: string): { abandoned?: string; fresh: string } {
+    const existing = this.currentRoundByUseCase.get(useCase);
+    let abandoned: string | undefined;
+    if (existing && this.openRounds.has(existing)) {
+      this.openRounds.delete(existing);
+      abandoned = existing;
+    }
+    this.currentRoundByUseCase.delete(useCase);
+    return { abandoned, fresh: this.createFreshRoundId(useCase) };
   }
 
   getCurrentRound(useCase: string): RoundRecord {
@@ -126,7 +153,9 @@ export class RoundManager {
 
     this.store.closeRound(round.roundId, round.useCase, envelopes.length, batchHash, this.submittedList(round));
     this.openRounds.delete(round.roundId);
-    this.currentRoundByUseCase.delete(round.useCase);
+    if (this.currentRoundByUseCase.get(round.useCase) === round.roundId) {
+      this.currentRoundByUseCase.delete(round.useCase);
+    }
 
     const batch: BatchRequest = {
       roundId: round.roundId,

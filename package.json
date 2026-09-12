@@ -9,7 +9,8 @@
     "test": "pnpm -r test",
     "test:e2e": "vitest run --config vitest.e2e.config.ts",
     "lint": "pnpm -r lint",
-    "typecheck": "pnpm -r typecheck"
+    "typecheck": "pnpm -r typecheck",
+    "record:demo": "node scripts/record-demo.mjs"
   },
   "engines": {
     "node": ">=18.0.0",
@@ -17,9 +18,9 @@
   },
   "packageManager": "pnpm@10.8.1+sha512.c50088ba998c67b8ca8c99df8a5e02fd2ae2e2b29aaf238feaa9e124248d3f48f9fb6db2424949ff901cffbb5e0f0cc1ad6aedb602cd29450751d11c35023677",
   "devDependencies": {
+    "playwright": "^1.63.0",
     "vitest": "^1.0.0"
   },
-  "dependencies": {},
   "workspaces": [
     "apps/*",
     "packages/*",

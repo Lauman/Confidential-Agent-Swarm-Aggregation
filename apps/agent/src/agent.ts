@@ -31,7 +31,7 @@ export class Agent {
     this.coordinator = new CoordinatorClient(config.coordinatorEndpoint);
   }
 
-  async run(proposalRef: string, useCase: UseCaseId = DELIBERATION_USE_CASE): Promise<AgentRunResult> {
+  async run(proposalRef: string, useCase: UseCaseId = DELIBERATION_USE_CASE, pinnedRoundId?: string): Promise<AgentRunResult> {
     let ballot: unknown;
 
     if (useCase === USE_CASES.deliberation) {
@@ -58,11 +58,13 @@ export class Agent {
       throw new Error(`Unsupported use case: ${useCase}`);
     }
 
-    let roundId: string;
-    try {
-      roundId = await this.coordinator.getCurrentRoundId(useCase);
-    } catch (error) {
-      throw new Error(`Agent ${this.config.id} could not get current round: ${(error as Error).message}`);
+    let roundId = pinnedRoundId;
+    if (!roundId) {
+      try {
+        roundId = await this.coordinator.getCurrentRoundId(useCase);
+      } catch (error) {
+        throw new Error(`Agent ${this.config.id} could not get current round: ${(error as Error).message}`);
+      }
     }
 
     const envelope = await this.envelopes.createEnvelope(roundId, useCase, ballot);

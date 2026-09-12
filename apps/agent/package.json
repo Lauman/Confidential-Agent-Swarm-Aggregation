@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "dev": "node --watch --loader ts-node/esm src/main.ts",
+    "dev": "echo \"agent: no auto-run in dev (would submit stray ballots to the demo round) — run manually: pnpm --filter @private-signal-swarm/agent start <proposalRef>\" && exit 0",
     "start": "node dist/main.js",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
