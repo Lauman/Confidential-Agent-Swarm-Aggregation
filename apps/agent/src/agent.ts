@@ -4,6 +4,9 @@ import { CoordinatorClient, CoordinatorClientError } from './coordinator-client.
 import { EnvelopeFactory, loadAgentPrivateKey } from './crypto.js';
 import { DELIBERATION_USE_CASE, deliberateMock } from './payload/deliberation.js';
 import { SIGNAL_ESTIMATE_USE_CASE, estimateMock } from './payload/signal-estimate.js';
+import { assignPersona } from './payload/personas.js';
+import { loadProposal } from './payload/proposals.js';
+import { deliberateLLM } from './payload/llm-estimator.js';
 
 export interface AgentRunResult {
   status: 'submitted' | 'quorum-reached' | 'skipped';
@@ -32,7 +35,23 @@ export class Agent {
     let ballot: unknown;
 
     if (useCase === USE_CASES.deliberation) {
-      ballot = deliberateMock(this.config.id, proposalRef);
+      const reasoning = this.config.reasoning;
+      if (reasoning?.mode === 'llm') {
+        if (!reasoning.apiKey) {
+          throw new Error(
+            `Agent ${this.config.id}: AGENT_REASONING=llm requires LLM_API_KEY (or use mock mode)`
+          );
+        }
+        const proposal = loadProposal(proposalRef);
+        ballot = await deliberateLLM(proposal, assignPersona(this.config.id), {
+          baseUrl: reasoning.baseUrl,
+          apiKey: reasoning.apiKey,
+          model: reasoning.model,
+          timeoutMs: reasoning.timeoutMs,
+        });
+      } else {
+        ballot = deliberateMock(this.config.id, proposalRef);
+      }
     } else if (useCase === USE_CASES.signalEstimate) {
       ballot = estimateMock(this.config.id, proposalRef);
     } else {

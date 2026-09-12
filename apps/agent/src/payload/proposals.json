@@ -1,0 +1,19 @@
+{
+  "proposals": [
+    {
+      "ref": "dao-grants-007",
+      "title": "Community Grants Round 7 — 120,000 tokens",
+      "body": "Fund nine community-built public goods (developer tooling, translations, onboarding guides) from the ecosystem reserve. Total ask is 120,000 tokens, roughly 4% of the quarterly budget. Milestone-based payouts with a community multisig holding clawback power. Proponents cite three prior rounds with 92% milestone completion. Opponents note grant farming in round 5 and thin reviewer bandwidth this quarter."
+    },
+    {
+      "ref": "dao-treasury-001",
+      "title": "Treasury Rebalance — 40% into staked ETH",
+      "body": "Move 40% of the stablecoin treasury into staked ETH ahead of the upgrade cycle. Proponents project 3-4% additional annual yield and closer alignment with the ecosystem. Opponents warn this halves the stables runway from 26 to 13 months and concentrates slashing and depeg exposure weeks before a major protocol upgrade."
+    },
+    {
+      "ref": "dao-risk-009",
+      "title": "Emergency Pause Guardian — 3-of-5 council",
+      "body": "Appoint a 3-of-5 emergency council able to pause core contracts for up to 72 hours during active exploits, with automatic expiry and a mandatory post-mortem vote. Proponents point to last month's $2M near-miss that took 9 hours to coordinate. Opponents argue pause powers centralize control and could be used to censor legitimate large withdrawals."
+    }
+  ]
+}

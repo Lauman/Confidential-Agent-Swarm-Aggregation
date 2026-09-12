@@ -15,5 +15,12 @@ export function loadConfig(): AgentConfig {
     keySource: 'keymap',
     keymapPath,
     agentPrivateKey: process.env.AGENT_PRIVATE_KEY || undefined,
+    reasoning: {
+      mode: process.env.AGENT_REASONING === 'llm' ? 'llm' : 'mock',
+      baseUrl: process.env.LLM_BASE_URL || 'https://generativelanguage.googleapis.com/v1beta/openai/',
+      apiKey: process.env.LLM_API_KEY || undefined,
+      model: process.env.LLM_MODEL || 'gemini-3.6-flash',
+      timeoutMs: process.env.LLM_TIMEOUT_MS ? parseInt(process.env.LLM_TIMEOUT_MS, 10) : undefined,
+    },
   };
 }

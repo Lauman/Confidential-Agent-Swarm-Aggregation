@@ -9,6 +9,8 @@ import {
 } from './api.js';
 import { agentEnsName, readTeeSignPub } from './ens.js';
 import { verifyVerdictSignature } from './verify.js';
+import { assignPersona } from '@private-signal-swarm/confidential-core';
+import { findProposal } from './data/proposals.js';
 import {
   CHECKPOINT_TX,
   PRESET_PROPOSALS,
@@ -213,6 +215,7 @@ export default function App() {
   const filled = round ? (round.submittedAgents ?? []) : [];
   const verdictKind = verdict?.payload.verdict;
   const revealed = verdict && verdictKind && verifiedRounds[verdict.roundId] === true;
+  const activeProposal = findProposal(proposalRef);
 
   return (
     <div className="shell">
@@ -284,6 +287,13 @@ export default function App() {
             </p>
           )}
 
+          {activeProposal && (
+            <div className="proposal-card">
+              <div className="proposal-title">{activeProposal.title}</div>
+              <p className="proposal-body">{activeProposal.body}</p>
+            </div>
+          )}
+
           {round ? (
             <>
               <div className="slots">
@@ -294,6 +304,7 @@ export default function App() {
                       <div className="who" title={agent.agentId} translate="no">
                         {agentEnsName(agent.agentId)}
                       </div>
+                      <div className="persona">{assignPersona(agent.agentId).name}</div>
                       <div className="state">sealed</div>
                       <div className="hash" title={agent.envelopeHash} translate="no">
                         {shortHash(agent.envelopeHash)}

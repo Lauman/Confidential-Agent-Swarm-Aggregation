@@ -40,7 +40,7 @@ export interface StatusEntry {
 
 export const PRESET_PROPOSALS = [
   { ref: 'dao-grants-007', label: 'Grants round 7', expect: 'pass' as VerdictKind },
-  { ref: 'dao-treasury-001', label: 'Treasury rebalance', expect: 'contested' as VerdictKind },
+  { ref: 'dao-treasury-001', label: 'Treasury rebalance', expect: 'fail' as VerdictKind },
 ];
 
 export const CHECKPOINT_TX = '0.0.7162784-1788987812-939625135';

@@ -300,6 +300,28 @@ button {
   margin: 0 0 18px;
 }
 
+.proposal-card {
+  border: 1px solid var(--ink-line);
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  background: var(--ink);
+}
+
+.proposal-title {
+  font-family: var(--display);
+  font-size: 1.05rem;
+  color: var(--paper);
+  margin-bottom: 6px;
+  text-wrap: balance;
+}
+
+.proposal-body {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--paper-dim);
+  max-width: 62ch;
+}
+
 .slots {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -322,7 +344,16 @@ button {
   font-family: var(--mono);
   font-size: 0.8rem;
   color: var(--amber);
-  margin-bottom: 6px;
+  margin-bottom: 2px;
+}
+
+.slot .persona {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ghost);
+  margin-bottom: 8px;
 }
 
 .slot .state {

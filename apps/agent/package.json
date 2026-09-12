@@ -13,7 +13,8 @@
   },
   "dependencies": {
     "@private-signal-swarm/confidential-core": "workspace:*",
-    "@private-signal-swarm/types": "workspace:*"
+    "@private-signal-swarm/types": "workspace:*",
+    "zod": "^3.23.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

@@ -229,108 +229,171 @@
       ],
       "batchHash": "83e67a86cf72311f4762efdd70e8919ebd5a2f5916b9e1c98f67abdd384fb459",
       "closedAt": 1789161413365
+    },
+    "round-deliberation.v1-mtxig70c-lnkqn3": {
+      "useCase": "deliberation.v1",
+      "submissionCount": 3,
+      "submittedAgents": [
+        {
+          "agentId": "agent-1",
+          "envelopeHash": "0d34119ad040548c4e1b5e0c6e607b8bbb7e15953786d94bcae8a69812bc157c",
+          "submittedAt": 1789164709066
+        },
+        {
+          "agentId": "agent-2",
+          "envelopeHash": "11d5d5b6fd850112911a701176e688a3641ad7f2b3be61f2622faf07c06584c6",
+          "submittedAt": 1789164709073
+        },
+        {
+          "agentId": "agent-3",
+          "envelopeHash": "a58a8cbc64dc17a714697ccbabe80d466f933cd132d7ec6a420dd12aead26d29",
+          "submittedAt": 1789164709078
+        }
+      ],
+      "batchHash": "90b32a27a783ad1fe281716533c07ed2e18ab53cc651401ca445f2c207a02514",
+      "closedAt": 1789164709078
+    },
+    "round-deliberation.v1-mtycy8v5-klhp07": {
+      "useCase": "deliberation.v1",
+      "submissionCount": 3,
+      "submittedAgents": [
+        {
+          "agentId": "agent-3",
+          "envelopeHash": "e2fea83a602db06ee8eff99bc91f8aa22972ca58a846acc002c06a9b6729766d",
+          "submittedAt": 1789215901081
+        },
+        {
+          "agentId": "agent-1",
+          "envelopeHash": "82ad086683be0321f5965968ee050744b7fb327d96f682db0d560fef993f43fd",
+          "submittedAt": 1789215901084
+        },
+        {
+          "agentId": "agent-2",
+          "envelopeHash": "2c831c5ad2c01deb2eb31b3adc491974d981d89f750b7c887f17d1646ccd9704",
+          "submittedAt": 1789215901086
+        }
+      ],
+      "batchHash": "7dd52ae4aee207d028d10bd92a463e703e36957314ba5969fb2f4c3bfd6a2cd2",
+      "closedAt": 1789215901086
+    },
+    "round-deliberation.v1-mtyd0wqe-o4wwoh": {
+      "useCase": "deliberation.v1",
+      "submissionCount": 3,
+      "submittedAgents": [
+        {
+          "agentId": "agent-3",
+          "envelopeHash": "be0d7921578447804256ef2e7fbd0671b7587685757ba1b4ad24a27eada71cbc",
+          "submittedAt": 1789216025300
+        },
+        {
+          "agentId": "agent-1",
+          "envelopeHash": "edcb7d6de3ece120bfd1b6111062db35a27b48bf06889678fa03626e1117df6a",
+          "submittedAt": 1789216025496
+        },
+        {
+          "agentId": "agent-2",
+          "envelopeHash": "35aaf014940940a9ed8d90bb2424b3e47213d948bc4b7c266bbd8b090e64a029",
+          "submittedAt": 1789216025500
+        }
+      ],
+      "batchHash": "0c2e604e038758209d981c0fdb2cc38f23deced8096009aba1a949c045bc2309",
+      "closedAt": 1789216025500
+    },
+    "round-deliberation.v1-mtydkd1j-77ydsi": {
+      "useCase": "deliberation.v1",
+      "submissionCount": 3,
+      "submittedAgents": [
+        {
+          "agentId": "agent-1",
+          "envelopeHash": "494edad59aa7c7025e10a4bb0c0ad799f834caf71b6632afd546109375097f27",
+          "submittedAt": 1789216932929
+        },
+        {
+          "agentId": "agent-2",
+          "envelopeHash": "73bc27a78dd91b02ae6218c13347ec329b475978dedad73f86f345ccfaf98cb7",
+          "submittedAt": 1789216943562
+        },
+        {
+          "agentId": "agent-3",
+          "envelopeHash": "ac918b7e12165ae91658e106867a17e645bb7746234b16d32f4157dfd5f06988",
+          "submittedAt": 1789216987702
+        }
+      ],
+      "batchHash": "c036fcdca789dd2783af9703a43cb450dfa38761202c7e51776f1f2580040ec0",
+      "closedAt": 1789216987702
+    },
+    "round-deliberation.v1-mtyf6b9l-fu36bj": {
+      "useCase": "deliberation.v1",
+      "submissionCount": 3,
+      "submittedAgents": [
+        {
+          "agentId": "agent-1",
+          "envelopeHash": "36b31820808030c489ea0afc381ec27dad71746ce0a1449bcee7f86eeb9bd992",
+          "submittedAt": 1789219636676
+        },
+        {
+          "agentId": "agent-2",
+          "envelopeHash": "bbd84c1afbe6c71eb66a3ee345545d0ab5ec4476d7016f9864b7af56c868c094",
+          "submittedAt": 1789219643386
+        },
+        {
+          "agentId": "agent-3",
+          "envelopeHash": "a40add78994338159a94ae817a42ace945961712ed440b9d1b959000d38f18a0",
+          "submittedAt": 1789219695013
+        }
+      ],
+      "batchHash": "31c87a7657bcfb8702a480d70963814cd109240dcc7895b8ed5d15b0e1e87d7c",
+      "closedAt": 1789219695014
+    },
+    "round-deliberation.v1-mtyfdsw8-claiey": {
+      "useCase": "deliberation.v1",
+      "submissionCount": 3,
+      "submittedAgents": [
+        {
+          "agentId": "agent-1",
+          "envelopeHash": "52da092a809fbeb6ac3521c85330b88ba5fe642313963b2f833503cef8e47665",
+          "submittedAt": 1789219986113
+        },
+        {
+          "agentId": "agent-3",
+          "envelopeHash": "aed8947e4725ef8d13466c80bcb15bc36eba6c381975a18112dbda287f4e52f2",
+          "submittedAt": 1789219986604
+        },
+        {
+          "agentId": "agent-2",
+          "envelopeHash": "05ca3135fd0fe06a533a945129ab35f398ecfb9e44f303f1aebb6ed0957854d4",
+          "submittedAt": 1789219989746
+        }
+      ],
+      "batchHash": "74a90ebb0db014492dac238133dda9c997de533726751ed2ad9a8b32ebaf958b",
+      "closedAt": 1789219989746
+    },
+    "round-deliberation.v1-mtyfvynl-rx4sfz": {
+      "useCase": "deliberation.v1",
+      "submissionCount": 3,
+      "submittedAgents": [
+        {
+          "agentId": "agent-1",
+          "envelopeHash": "069b55a8b916c51024bd11d4c8b78d0301b15d7c7c5c745c2a16ebb3092403ea",
+          "submittedAt": 1789220847544
+        },
+        {
+          "agentId": "agent-3",
+          "envelopeHash": "739acfb05879cc62ea4f5d5ca86ce721fcb4872b04ae6d57ee4e6b6f25a7fcc6",
+          "submittedAt": 1789220847551
+        },
+        {
+          "agentId": "agent-2",
+          "envelopeHash": "712b6225b79412c9bc706d9e00c12a917e616f7bc252833799dc3bf751c5c13b",
+          "submittedAt": 1789220847552
+        }
+      ],
+      "batchHash": "f63adf9f36202ecbcdd8782348dc78b297d501527e668e760506abbc02272e0f",
+      "closedAt": 1789220847552
     }
   },
   "results": {
     "deliberation.v1": [
-      {
-        "version": 1,
-        "useCase": "deliberation.v1",
-        "roundId": "round-deliberation.v1-mtxfvt0q-qnqg0f",
-        "participantCount": 3,
-        "timestamp": 1789160359961,
-        "payload": {
-          "roundId": "round-deliberation.v1-mtxfvt0q-qnqg0f",
-          "proposalRef": "dao-grants-007",
-          "verdict": "pass",
-          "participantCount": 3
-        },
-        "teeSignature": "EwvZ1/1tW/kgjowQ8Te8mhRoGgdVZ7xY8ZgigZlkUUnHY9FzEBR0/IBxmz16Q6EtvNoNhwjCodgSZFcMKVklAQ=="
-      },
-      {
-        "version": 1,
-        "useCase": "deliberation.v1",
-        "roundId": "round-deliberation.v1-mtxfw3nb-o3j3th",
-        "participantCount": 3,
-        "timestamp": 1789160373733,
-        "payload": {
-          "roundId": "round-deliberation.v1-mtxfw3nb-o3j3th",
-          "proposalRef": "dao-grants-007",
-          "verdict": "pass",
-          "participantCount": 3
-        },
-        "teeSignature": "896M04EuCnX3eO8fnS1EgLbzcjUvksqi/YkMHmuEALA1jNnIbi4Zzm49lCH+UwewiK12m8q2EkWV/hmgvsdxAA=="
-      },
-      {
-        "version": 1,
-        "useCase": "deliberation.v1",
-        "roundId": "round-deliberation.v1-mtxg441z-373oci",
-        "participantCount": 3,
-        "timestamp": 1789160747511,
-        "payload": {
-          "roundId": "round-deliberation.v1-mtxg441z-373oci",
-          "proposalRef": "dao-grants-007",
-          "verdict": "pass",
-          "participantCount": 3
-        },
-        "teeSignature": "jZ3b15mvE05T55LeZN5YfZ0ekan5MNmUpRTdI2qrf+DeeIP/OmSMVCebd0OfCRfIUU5kAmljEEvudj2c0gbADg=="
-      },
-      {
-        "version": 1,
-        "useCase": "deliberation.v1",
-        "roundId": "round-deliberation.v1-mtxg4r61-ftgxur",
-        "participantCount": 3,
-        "timestamp": 1789160777399,
-        "payload": {
-          "roundId": "round-deliberation.v1-mtxg4r61-ftgxur",
-          "proposalRef": "dao-treasury-001",
-          "verdict": "contested",
-          "participantCount": 3
-        },
-        "teeSignature": "j6l4wkS5loRhtl4NlbIiE2fN9tcC851smf3SqZ63XqG5zzDxof8PVLK6A+lUcOV49Uml2fNTvVaWGL5HKiZdBQ=="
-      },
-      {
-        "version": 1,
-        "useCase": "deliberation.v1",
-        "roundId": "round-deliberation.v1-mtxg5k9f-id2exo",
-        "participantCount": 3,
-        "timestamp": 1789160815166,
-        "payload": {
-          "roundId": "round-deliberation.v1-mtxg5k9f-id2exo",
-          "proposalRef": "dao-grants-007",
-          "verdict": "pass",
-          "participantCount": 3
-        },
-        "teeSignature": "EYq8DFdcP01xo8p8XUuDMk7kdCV4+//xI5CRy0qh7cVmr1t+0mD0BwTZPBJJI9a6vbXX4YPZlbWLveC0Fes3Cw=="
-      },
-      {
-        "version": 1,
-        "useCase": "deliberation.v1",
-        "roundId": "round-deliberation.v1-mtxgawok-anacfx",
-        "participantCount": 3,
-        "timestamp": 1789161069924,
-        "payload": {
-          "roundId": "round-deliberation.v1-mtxgawok-anacfx",
-          "proposalRef": "dao-grants-007",
-          "verdict": "pass",
-          "participantCount": 3
-        },
-        "teeSignature": "7ll9P578zM4o3aNqZRemZXPReMuBmwUrXCZd6Mwuw5zdgXswURNmCJaM7MaKxW3Tm5//o3J9MTTa9C6CWNpRBg=="
-      },
-      {
-        "version": 1,
-        "useCase": "deliberation.v1",
-        "roundId": "round-deliberation.v1-mtxgb1b4-7q6ufs",
-        "participantCount": 3,
-        "timestamp": 1789161090903,
-        "payload": {
-          "roundId": "round-deliberation.v1-mtxgb1b4-7q6ufs",
-          "proposalRef": "dao-grants-007",
-          "verdict": "pass",
-          "participantCount": 3
-        },
-        "teeSignature": "Op7oizpgoXQkzMbZfDYXOMQXPSQVuLX+ttG+nk1UF6ytbJMzksFKhZbE2AnA7tpNcg4a4oNsOZa4/19ydn/WDQ=="
-      },
       {
         "version": 1,
         "useCase": "deliberation.v1",
@@ -372,6 +435,104 @@
           "participantCount": 3
         },
         "teeSignature": "Uxpy7dc+uiZUBQ//YvQ0kOaYQV69tGDAODk8AI8sGp4u4VYqSbQTuE2/lDFUJwf5cIiebeX8yf7jODXX5+3kDw=="
+      },
+      {
+        "version": 1,
+        "useCase": "deliberation.v1",
+        "roundId": "round-deliberation.v1-mtxig70c-lnkqn3",
+        "participantCount": 3,
+        "timestamp": 1789164709082,
+        "payload": {
+          "roundId": "round-deliberation.v1-mtxig70c-lnkqn3",
+          "proposalRef": "dao-grants-007",
+          "verdict": "pass",
+          "participantCount": 3
+        },
+        "teeSignature": "hMbzF51VycAouH4QcKqIHPJ4JLI+DfvJsSrbvHp+re6QLH6IA2+x36DjuD/6j0/Vf+wlR9aNyqxY7YehVKudBw=="
+      },
+      {
+        "version": 1,
+        "useCase": "deliberation.v1",
+        "roundId": "round-deliberation.v1-mtycy8v5-klhp07",
+        "participantCount": 3,
+        "timestamp": 1789215901093,
+        "payload": {
+          "roundId": "round-deliberation.v1-mtycy8v5-klhp07",
+          "proposalRef": "dao-grants-007",
+          "verdict": "contested",
+          "participantCount": 3
+        },
+        "teeSignature": "B4B48DdVABa5AuX08A5a0BuQfNdPorDxXUdFTVq0NiNmIWIPtXtXRaylMki34WWvwZrIYO1Qfqg2hLiQlbIuCw=="
+      },
+      {
+        "version": 1,
+        "useCase": "deliberation.v1",
+        "roundId": "round-deliberation.v1-mtyd0wqe-o4wwoh",
+        "participantCount": 3,
+        "timestamp": 1789216025506,
+        "payload": {
+          "roundId": "round-deliberation.v1-mtyd0wqe-o4wwoh",
+          "proposalRef": "dao-grants-007",
+          "verdict": "contested",
+          "participantCount": 3
+        },
+        "teeSignature": "xQmWm6MJt4vIZzY9vsZtV0QTG5i+WT1dx0hiN4IhKckdPsUYSwcL3+qNNGqIP6FiRwMsqznkTe4SGM+SQupABQ=="
+      },
+      {
+        "version": 1,
+        "useCase": "deliberation.v1",
+        "roundId": "round-deliberation.v1-mtydkd1j-77ydsi",
+        "participantCount": 3,
+        "timestamp": 1789216987706,
+        "payload": {
+          "roundId": "round-deliberation.v1-mtydkd1j-77ydsi",
+          "proposalRef": "dao-grants-007",
+          "verdict": "contested",
+          "participantCount": 3
+        },
+        "teeSignature": "VnB0uHrdnpZ5cr7fn3inKLjZv05QPolnsi5LRSSUdGA/PMYQBJCmsBbkVU40qWISpCIOvH7HZeJ7qPYMr4aBDA=="
+      },
+      {
+        "version": 1,
+        "useCase": "deliberation.v1",
+        "roundId": "round-deliberation.v1-mtyf6b9l-fu36bj",
+        "participantCount": 3,
+        "timestamp": 1789219695021,
+        "payload": {
+          "roundId": "round-deliberation.v1-mtyf6b9l-fu36bj",
+          "proposalRef": "dao-grants-007",
+          "verdict": "pass",
+          "participantCount": 3
+        },
+        "teeSignature": "aSu0gHyzx3QDZKic0WoeTUic8tjBjcbVej7y9opV488I9RuipXB46RKi/D/tBHhes9Oq1UIgOwuhiNTpQTtcBQ=="
+      },
+      {
+        "version": 1,
+        "useCase": "deliberation.v1",
+        "roundId": "round-deliberation.v1-mtyfdsw8-claiey",
+        "participantCount": 3,
+        "timestamp": 1789219989752,
+        "payload": {
+          "roundId": "round-deliberation.v1-mtyfdsw8-claiey",
+          "proposalRef": "dao-grants-007",
+          "verdict": "pass",
+          "participantCount": 3
+        },
+        "teeSignature": "4n1tV9XtfjPq7ryA0znoR99+sHNehInrLNMRG/ks2z9MYQDW4ByPiNgB5fP6jFLQ8SB43vCvR1pXQxEezYP0Ag=="
+      },
+      {
+        "version": 1,
+        "useCase": "deliberation.v1",
+        "roundId": "round-deliberation.v1-mtyfvynl-rx4sfz",
+        "participantCount": 3,
+        "timestamp": 1789220847557,
+        "payload": {
+          "roundId": "round-deliberation.v1-mtyfvynl-rx4sfz",
+          "proposalRef": "dao-grants-007",
+          "verdict": "pass",
+          "participantCount": 3
+        },
+        "teeSignature": "MutT/Bpq37rPkVaA1KPKpRybBvElTBMn7t80lxjoQcI+NNA2i4FaTEbMwdNw4Y4G9ZhNhzrKxehZZ9smiNqtCQ=="
       }
     ]
   }
