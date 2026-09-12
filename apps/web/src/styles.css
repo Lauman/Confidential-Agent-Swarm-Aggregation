@@ -415,6 +415,66 @@ button {
   overflow-wrap: anywhere;
 }
 
+.theater {
+  border: 1px solid var(--ink-line);
+  background: var(--ink);
+  padding: 14px 16px;
+  margin-bottom: 20px;
+}
+
+.theater-head {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 10px;
+}
+
+.theater ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.theater li {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  font-size: 0.86rem;
+  color: var(--paper-dim);
+  animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.theater .t-persona {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ghost);
+  white-space: nowrap;
+  min-width: 130px;
+}
+
+.theater .t-text {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--paper-dim);
+}
+
+.theater li.latest .t-text {
+  color: var(--amber);
+  animation: deliberate-pulse 1.1s ease-in-out infinite;
+}
+
+.theater li.t-sealed .t-text,
+.theater li.t-sealed .t-persona {
+  color: var(--mint);
+}
+
 .feed {
   list-style: none;
   margin: 0;
@@ -617,7 +677,9 @@ button {
   .verdict-enter,
   .load-in,
   .quorumbar > div,
-  .slot.ghost.deliberating {
+  .slot.ghost.deliberating,
+  .theater li,
+  .theater li.latest .t-text {
     animation: none;
     transition: none;
   }

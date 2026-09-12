@@ -45,6 +45,23 @@ export function fetchDemoActive(useCase: string): Promise<DemoActiveState> {
   );
 }
 
+export async function resetDemoRound(): Promise<{ ok: boolean; message: string }> {
+  try {
+    const res = await fetch(`${COORD}/api/demo/reset`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ useCase: 'deliberation' }),
+    });
+    if (!res.ok) {
+      const body = (await res.json().catch(() => null)) as { message?: string } | null;
+      return { ok: false, message: body?.message ?? `Coordinator refused (${res.status}).` };
+    }
+    return { ok: true, message: 'Stuck round cleared — press Deliberate to start fresh.' };
+  } catch {
+    return { ok: false, message: 'Coordinator unreachable at :3001 — is it running?' };
+  }
+}
+
 export async function runDemoRound(proposalRef: string): Promise<DemoStartResult> {
   try {
     const res = await fetch(`${COORD}/api/demo/run-round`, {

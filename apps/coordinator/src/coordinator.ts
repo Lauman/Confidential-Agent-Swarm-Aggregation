@@ -1,46 +1,9 @@
 import { Router } from 'express';import type { RoundRecord } from '@private-signal-swarm/types';
 import { config } from './config.js';
-import { loadKeymap } from './keymap.js';
-import { EnvelopeValidationError, EnvelopeValidator } from './envelope-validator.js';
-import { RoundManager } from './round-manager.js';
-import { TombstoneStore } from './tombstone-store.js';
-import { LocalTeeRunner } from './tee-seam.js';
-import { DeployedAttestor } from './deployed-attestor.js';
-import { ResultPusher } from './result-pusher.js';
+import { EnvelopeValidationError } from './envelope-validator.js';
+import { roundManager, validator } from './round-state.js';
 
 export const coordinatorRouter: Router = Router();
-
-const keymap = loadKeymap(config.keymapPath);
-const validator = new EnvelopeValidator({
-  keymap,
-  allowedUseCases: config.allowedUseCases,
-});
-const store = new TombstoneStore(config.stateDir);
-const teeSeam = new LocalTeeRunner(config.devSecretsPath);
-const resultPusher = new ResultPusher(config.resultIngestUrl);
-const deployedAttestor =
-  config.creGatewayUrl && config.creWorkflowId && config.coordinatorSigningKey && config.donTeeEncPub
-    ? new DeployedAttestor({
-        gatewayUrl: config.creGatewayUrl,
-        workflowId: config.creWorkflowId,
-        signingKey: config.coordinatorSigningKey,
-        donTeeEncPub: config.donTeeEncPub,
-        devSecretsPath: config.devSecretsPath,
-      })
-    : undefined;
-if (deployedAttestor) {
-  console.log(`Deployed CRE trigger armed: workflow ${config.creWorkflowId} via ${config.creGatewayUrl} (signer ${deployedAttestor.signerAddress})`);
-} else {
-  console.log('Deployed CRE trigger off — set CRE_GATEWAY_URL, CRE_WORKFLOW_ID, a signing key (COORDINATOR_SIGNING_KEY), and DON_TEE_ENC_PUB to arm it');
-}
-const roundManager = new RoundManager({
-  quorum: config.quorum,
-  teeSeam,
-  store,
-  keyId: keymap.keyId,
-  onResult: (result) => void resultPusher.push(result),
-  deployedAttestor,
-});
 
 coordinatorRouter.get('/round/current', (req, res) => {
   const useCase = typeof req.query.useCase === 'string' ? req.query.useCase : '';

@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      playwright:
+        specifier: ^1.63.0
+        version: 1.63.0
       vitest:
         specifier: ^1.0.0
         version: 1.6.1(@types/node@22.7.5)(terser@5.51.2)
@@ -161,7 +164,7 @@ importers:
     dependencies:
       '@chainlink/cre-sdk':
         specifier: ^1.19.0
-        version: 1.20.0(typescript@5.9.3)
+        version: 1.20.0(typescript@5.4.5)
       '@chainlink/cre-sdk-javy-plugin':
         specifier: 1.7.0
         version: 1.7.0(zod@3.25.76)
@@ -2038,6 +2041,16 @@ packages:
   pkg-types@1.3.1:
     resolution: {integrity: sha512-/Jm5M4RvtBFVkKWRu2BLUTNP8/M2a+UwuAX+ae4770q1qVGtfjG+WTCupoZixokjmHiry8uI+dlY8KXYV5HVVQ==}
 
+  playwright-core@1.63.0:
+    resolution: {integrity: sha512-rYCsBF/M5HjUch52bbtVONEFjv6Xu8sm8h72dNlR5bzIE1fvC/bxgspzkjSfU+MweEMmPM8KJebG6nnyxo5mCg==}
+    engines: {node: '>=20'}
+    hasBin: true
+
+  playwright@1.63.0:
+    resolution: {integrity: sha512-+7ziBLidS4NaNCdt57SUDT+wYmmd5fmiQejUic/kb+YsYSCPyOOE9sebzMjNmQrsnNpDJqd4WHvV/8lfKfUDUg==}
+    engines: {node: '>=20'}
+    hasBin: true
+
   postcss@8.5.28:
     resolution: {integrity: sha512-RRuzqDtt5Y9h3quz5hWhK+TPnsmVs6WwSU6LkJMeY4HstUEDuYTG8UJSdawMRzmzAtV+KEoG8N3Qg2qLy5vM/A==}
     engines: {node: ^10 || ^12 || >=14}
@@ -2727,16 +2740,16 @@ snapshots:
     optionalDependencies:
       zod: 3.25.76
 
-  '@chainlink/cre-sdk@1.20.0(typescript@5.9.3)':
+  '@chainlink/cre-sdk@1.20.0(typescript@5.4.5)':
     dependencies:
       '@bufbuild/protobuf': 2.6.3
       '@bufbuild/protoc-gen-es': 2.6.3(@bufbuild/protobuf@2.6.3)
       '@chainlink/cre-sdk-javy-plugin': 1.7.0(zod@3.25.76)
       '@noble/hashes': 2.2.0
-      '@solana/addresses': 6.10.0(typescript@5.9.3)
-      '@solana/codecs': 6.10.0(typescript@5.9.3)
+      '@solana/addresses': 6.10.0(typescript@5.4.5)
+      '@solana/codecs': 6.10.0(typescript@5.4.5)
       '@standard-schema/spec': 1.0.0
-      viem: 2.56.3(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76)
+      viem: 2.56.3(typescript@5.4.5)(zod@3.25.76)
       zod: 3.25.76
     transitivePeerDependencies:
       - bufferutil
@@ -2754,7 +2767,7 @@ snapshots:
       '@solana/addresses': 6.10.0(typescript@5.9.3)
       '@solana/codecs': 6.10.0(typescript@5.9.3)
       '@standard-schema/spec': 1.0.0
-      viem: 2.56.3(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76)
+      viem: 2.56.3(typescript@5.9.3)(zod@3.25.76)
       zod: 3.25.76
     transitivePeerDependencies:
       - bufferutil
@@ -3180,6 +3193,18 @@ snapshots:
 
   '@sinclair/typebox@0.27.12': {}
 
+  '@solana/addresses@6.10.0(typescript@5.4.5)':
+    dependencies:
+      '@solana/assertions': 6.10.0(typescript@5.4.5)
+      '@solana/codecs-core': 6.10.0(typescript@5.4.5)
+      '@solana/codecs-strings': 6.10.0(typescript@5.4.5)
+      '@solana/errors': 6.10.0(typescript@5.4.5)
+      '@solana/nominal-types': 6.10.0(typescript@5.4.5)
+    optionalDependencies:
+      typescript: 5.4.5
+    transitivePeerDependencies:
+      - fastestsmallesttextencoderdecoder
+
   '@solana/addresses@6.10.0(typescript@5.9.3)':
     dependencies:
       '@solana/assertions': 6.10.0(typescript@5.9.3)
@@ -3192,17 +3217,37 @@ snapshots:
     transitivePeerDependencies:
       - fastestsmallesttextencoderdecoder
 
+  '@solana/assertions@6.10.0(typescript@5.4.5)':
+    dependencies:
+      '@solana/errors': 6.10.0(typescript@5.4.5)
+    optionalDependencies:
+      typescript: 5.4.5
+
   '@solana/assertions@6.10.0(typescript@5.9.3)':
     dependencies:
       '@solana/errors': 6.10.0(typescript@5.9.3)
     optionalDependencies:
       typescript: 5.9.3
 
+  '@solana/codecs-core@6.10.0(typescript@5.4.5)':
+    dependencies:
+      '@solana/errors': 6.10.0(typescript@5.4.5)
+    optionalDependencies:
+      typescript: 5.4.5
+
   '@solana/codecs-core@6.10.0(typescript@5.9.3)':
     dependencies:
       '@solana/errors': 6.10.0(typescript@5.9.3)
     optionalDependencies:
       typescript: 5.9.3
+
+  '@solana/codecs-data-structures@6.10.0(typescript@5.4.5)':
+    dependencies:
+      '@solana/codecs-core': 6.10.0(typescript@5.4.5)
+      '@solana/codecs-numbers': 6.10.0(typescript@5.4.5)
+      '@solana/errors': 6.10.0(typescript@5.4.5)
+    optionalDependencies:
+      typescript: 5.4.5
 
   '@solana/codecs-data-structures@6.10.0(typescript@5.9.3)':
     dependencies:
@@ -3212,12 +3257,27 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.3
 
+  '@solana/codecs-numbers@6.10.0(typescript@5.4.5)':
+    dependencies:
+      '@solana/codecs-core': 6.10.0(typescript@5.4.5)
+      '@solana/errors': 6.10.0(typescript@5.4.5)
+    optionalDependencies:
+      typescript: 5.4.5
+
   '@solana/codecs-numbers@6.10.0(typescript@5.9.3)':
     dependencies:
       '@solana/codecs-core': 6.10.0(typescript@5.9.3)
       '@solana/errors': 6.10.0(typescript@5.9.3)
     optionalDependencies:
       typescript: 5.9.3
+
+  '@solana/codecs-strings@6.10.0(typescript@5.4.5)':
+    dependencies:
+      '@solana/codecs-core': 6.10.0(typescript@5.4.5)
+      '@solana/codecs-numbers': 6.10.0(typescript@5.4.5)
+      '@solana/errors': 6.10.0(typescript@5.4.5)
+    optionalDependencies:
+      typescript: 5.4.5
 
   '@solana/codecs-strings@6.10.0(typescript@5.9.3)':
     dependencies:
@@ -3226,6 +3286,19 @@ snapshots:
       '@solana/errors': 6.10.0(typescript@5.9.3)
     optionalDependencies:
       typescript: 5.9.3
+
+  '@solana/codecs@6.10.0(typescript@5.4.5)':
+    dependencies:
+      '@solana/codecs-core': 6.10.0(typescript@5.4.5)
+      '@solana/codecs-data-structures': 6.10.0(typescript@5.4.5)
+      '@solana/codecs-numbers': 6.10.0(typescript@5.4.5)
+      '@solana/codecs-strings': 6.10.0(typescript@5.4.5)
+      '@solana/fixed-points': 6.10.0(typescript@5.4.5)
+      '@solana/options': 6.10.0(typescript@5.4.5)
+    optionalDependencies:
+      typescript: 5.4.5
+    transitivePeerDependencies:
+      - fastestsmallesttextencoderdecoder
 
   '@solana/codecs@6.10.0(typescript@5.9.3)':
     dependencies:
@@ -3240,12 +3313,26 @@ snapshots:
     transitivePeerDependencies:
       - fastestsmallesttextencoderdecoder
 
+  '@solana/errors@6.10.0(typescript@5.4.5)':
+    dependencies:
+      chalk: 5.6.2
+      commander: 15.0.0
+    optionalDependencies:
+      typescript: 5.4.5
+
   '@solana/errors@6.10.0(typescript@5.9.3)':
     dependencies:
       chalk: 5.6.2
       commander: 15.0.0
     optionalDependencies:
       typescript: 5.9.3
+
+  '@solana/fixed-points@6.10.0(typescript@5.4.5)':
+    dependencies:
+      '@solana/codecs-core': 6.10.0(typescript@5.4.5)
+      '@solana/errors': 6.10.0(typescript@5.4.5)
+    optionalDependencies:
+      typescript: 5.4.5
 
   '@solana/fixed-points@6.10.0(typescript@5.9.3)':
     dependencies:
@@ -3254,9 +3341,25 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.3
 
+  '@solana/nominal-types@6.10.0(typescript@5.4.5)':
+    optionalDependencies:
+      typescript: 5.4.5
+
   '@solana/nominal-types@6.10.0(typescript@5.9.3)':
     optionalDependencies:
       typescript: 5.9.3
+
+  '@solana/options@6.10.0(typescript@5.4.5)':
+    dependencies:
+      '@solana/codecs-core': 6.10.0(typescript@5.4.5)
+      '@solana/codecs-data-structures': 6.10.0(typescript@5.4.5)
+      '@solana/codecs-numbers': 6.10.0(typescript@5.4.5)
+      '@solana/codecs-strings': 6.10.0(typescript@5.4.5)
+      '@solana/errors': 6.10.0(typescript@5.4.5)
+    optionalDependencies:
+      typescript: 5.4.5
+    transitivePeerDependencies:
+      - fastestsmallesttextencoderdecoder
 
   '@solana/options@6.10.0(typescript@5.9.3)':
     dependencies:
@@ -3486,9 +3589,19 @@ snapshots:
       - supports-color
       - utf-8-validate
 
+  abitype@1.2.3(typescript@5.4.5)(zod@3.25.76):
+    optionalDependencies:
+      typescript: 5.4.5
+      zod: 3.25.76
+
   abitype@1.2.3(typescript@5.9.3)(zod@3.25.76):
     optionalDependencies:
       typescript: 5.9.3
+      zod: 3.25.76
+
+  abitype@1.3.0(typescript@5.4.5)(zod@3.25.76):
+    optionalDependencies:
+      typescript: 5.4.5
       zod: 3.25.76
 
   abitype@1.3.0(typescript@5.9.3)(zod@3.25.76):
@@ -4052,7 +4165,7 @@ snapshots:
 
   isexe@2.0.0: {}
 
-  isows@1.0.7(ws@8.21.0):
+  isows@1.0.7(ws@8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)):
     dependencies:
       ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
 
@@ -4420,6 +4533,21 @@ snapshots:
       is-docker: 2.2.1
       is-wsl: 2.2.0
 
+  ox@0.14.44(typescript@5.4.5)(zod@3.25.76):
+    dependencies:
+      '@adraffy/ens-normalize': 1.11.1
+      '@noble/ciphers': 1.3.0
+      '@noble/curves': 1.9.1
+      '@noble/hashes': 1.8.0
+      '@scure/bip32': 1.7.0
+      '@scure/bip39': 1.6.0
+      abitype: 1.3.0(typescript@5.4.5)(zod@3.25.76)
+      eventemitter3: 5.0.1
+    optionalDependencies:
+      typescript: 5.4.5
+    transitivePeerDependencies:
+      - zod
+
   ox@0.14.44(typescript@5.9.3)(zod@3.25.76):
     dependencies:
       '@adraffy/ens-normalize': 1.11.1
@@ -4500,6 +4628,12 @@ snapshots:
       confbox: 0.1.8
       mlly: 1.8.2
       pathe: 2.0.3
+
+  playwright-core@1.63.0: {}
+
+  playwright@1.63.0:
+    dependencies:
+      playwright-core: 1.63.0
 
   postcss@8.5.28:
     dependencies:
@@ -4941,7 +5075,41 @@ snapshots:
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
       abitype: 1.2.3(typescript@5.9.3)(zod@3.25.76)
-      isows: 1.0.7(ws@8.21.0)
+      isows: 1.0.7(ws@8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))
+      ox: 0.14.44(typescript@5.9.3)(zod@3.25.76)
+      ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+    optionalDependencies:
+      typescript: 5.9.3
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+      - zod
+
+  viem@2.56.3(typescript@5.4.5)(zod@3.25.76):
+    dependencies:
+      '@noble/curves': 1.9.1
+      '@noble/hashes': 1.8.0
+      '@scure/bip32': 1.7.0
+      '@scure/bip39': 1.6.0
+      abitype: 1.2.3(typescript@5.4.5)(zod@3.25.76)
+      isows: 1.0.7(ws@8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))
+      ox: 0.14.44(typescript@5.4.5)(zod@3.25.76)
+      ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+    optionalDependencies:
+      typescript: 5.4.5
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+      - zod
+
+  viem@2.56.3(typescript@5.9.3)(zod@3.25.76):
+    dependencies:
+      '@noble/curves': 1.9.1
+      '@noble/hashes': 1.8.0
+      '@scure/bip32': 1.7.0
+      '@scure/bip39': 1.6.0
+      abitype: 1.2.3(typescript@5.9.3)(zod@3.25.76)
+      isows: 1.0.7(ws@8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))
       ox: 0.14.44(typescript@5.9.3)(zod@3.25.76)
       ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     optionalDependencies:
