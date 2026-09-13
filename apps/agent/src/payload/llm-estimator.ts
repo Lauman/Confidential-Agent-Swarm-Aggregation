@@ -105,10 +105,6 @@ async function callOnce(
         ],
         response_format: { type: 'json_object' },
         temperature: 0.7,
-        // max_completion_tokens only: this endpoint rejects both params set.
-        // NOTE: no provider-specific params (e.g. chat_template_kwargs) —
-        // strict endpoints 400 on unknown fields. Generous budget: reasoning
-        // traces eat tokens before the answer appears; the 90s timeout covers it.
         max_completion_tokens: 2000,
       }),
       signal: controller.signal,

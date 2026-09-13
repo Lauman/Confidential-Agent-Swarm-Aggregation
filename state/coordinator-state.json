@@ -549,30 +549,30 @@
           "verdict": "pass",
           "participantCount": 3
         },
-        "teeSignature": "aSu0gHyzx3QDZKic0WoeTUic8tjBjcbVej7y9opV488I9RuipXB46RKi/D/tBHhes9Oq1UIgOwuhiNTpQTtcBQ=="
+        "teeSignature": "sUK6f8SSepIR3x971DVUwIUM06zXWkih7Hpf1Md6bbCkyQGhmvnPii8KZ4bnfAFkE+rBOmV9Dc+sRyNhh9yCDw=="
       },
       {
         "version": 1,
         "useCase": "deliberation.v1",
-        "roundId": "round-deliberation.v1-mtyfdsw8-claiey",
+        "roundId": "round-deliberation.v1-mtyqnibz-up3qr2",
         "participantCount": 3,
-        "timestamp": 1789219989752,
+        "timestamp": 1789239107466,
         "payload": {
-          "roundId": "round-deliberation.v1-mtyfdsw8-claiey",
+          "roundId": "round-deliberation.v1-mtyqnibz-up3qr2",
           "proposalRef": "dao-grants-007",
           "verdict": "pass",
           "participantCount": 3
         },
-        "teeSignature": "4n1tV9XtfjPq7ryA0znoR99+sHNehInrLNMRG/ks2z9MYQDW4ByPiNgB5fP6jFLQ8SB43vCvR1pXQxEezYP0Ag=="
+        "teeSignature": "7X3zWyu2H6W0tVnj+M1hjoN5OSXWxmwzOPBjtfNwSSQZueK065fK8Gh/9auu8HU42rymFuxZyS+GcV9lSYnTAg=="
       },
       {
         "version": 1,
         "useCase": "deliberation.v1",
-        "roundId": "round-deliberation.v1-mtyfvynl-rx4sfz",
+        "roundId": "round-deliberation.v1-mtys3l13-20xzgw",
         "participantCount": 3,
-        "timestamp": 1789220847557,
+        "timestamp": 1789241455806,
         "payload": {
-          "roundId": "round-deliberation.v1-mtyfvynl-rx4sfz",
+          "roundId": "round-deliberation.v1-mtys3l13-20xzgw",
           "proposalRef": "dao-grants-007",
           "verdict": "pass",
           "participantCount": 3

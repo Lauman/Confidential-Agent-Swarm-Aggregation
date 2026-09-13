@@ -1,0 +1,39 @@
+# Coordinator — fly.toml
+# Deploy from repo root (Working directory = ethglobal2026/):
+#   fly apps create <coordinator-app> --org personal
+#   fly deploy --config fly.coordinator.toml --dockerfile Dockerfile.coordinator
+app = 'private-signal-coord-9bd169'
+primary_region = 'iad'
+
+[build]
+  dockerfile = 'Dockerfile.coordinator'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+  [[http_service.checks]]
+    grace_period = '10s'
+    interval = '30s'
+    method = 'GET'
+    path = '/health'
+    timeout = '5s'
+
+[env]
+  PORT = '8080'
+  QUORUM = '3'
+  AGENT_REASONING = 'llm'
+
+# Secrets to set (never commit):
+#   fly secrets set --config fly.coordinator.toml \
+#     KEYMAP_JSON="$(cat packages/confidential-core/.dev-keys/keymap.json)" \
+#     DEV_SECRETS_JSON="$(cat packages/confidential-core/.dev-keys/dev-secrets.json)" \
+#     RESULT_INGEST_URL="https://<resource-app>.fly.dev/api/internal/ingest" \
+#     LLM_API_KEY="..." LLM_BASE_URL="..." LLM_MODEL="..." \
+#     CRE_GATEWAY_URL="https://01.gateway.zone-a.cre.chain.link/" \
+#     CRE_WORKFLOW_ID="..." COORDINATOR_SIGNING_KEY="..." DON_TEE_ENC_PUB="..."
+# Without KEYMAP_JSON the entrypoint generates ephemeral demo keys.

@@ -3,3 +3,10 @@ packages:
   - "packages/*"
   - "cre"
   - "cre/*"
+
+# pnpm >=12 requires explicit approval for postinstall scripts (Docker/CI fail without it)
+allowBuilds:
+  bufferutil: true
+  esbuild: true
+  protobufjs: true
+  utf-8-validate: true

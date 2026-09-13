@@ -54,3 +54,4 @@ temp/
 .pnpm-debug.log
 
 .internal/*
+.vercel

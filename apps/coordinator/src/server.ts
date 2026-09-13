@@ -4,6 +4,7 @@ import { demoRouter } from './routes/demo.js';
 
 export function createApp(): Express {
   const app: Express = express();
+  app.set('trust proxy', 1);
   app.use(express.json());
   app.use('/', coordinatorRouter);
   app.use('/', demoRouter);

@@ -1,0 +1,15 @@
+# Resource server — x402-gated API (Express -> Fly 8080)
+# Build context: repo root (Working directory = ethglobal2026/)
+FROM node:20-slim
+RUN corepack enable && pnpm --version
+WORKDIR /app
+ENV NODE_ENV=production
+COPY . .
+RUN pnpm install --frozen-lockfile
+RUN pnpm --filter @private-signal-swarm/types build \
+ && pnpm --filter @private-signal-swarm/confidential-core build \
+ && pnpm --filter @private-signal-swarm/resource-server build
+COPY scripts/docker-entrypoint.sh scripts/docker-entrypoint.sh
+RUN chmod +x scripts/docker-entrypoint.sh
+EXPOSE 8080
+ENTRYPOINT ["scripts/docker-entrypoint.sh", "resource-server"]
