@@ -34,5 +34,6 @@ primary_region = 'iad'
 #     DEV_SECRETS_JSON="$(cat packages/confidential-core/.dev-keys/dev-secrets.json)" \
 #     RESULT_INGEST_URL="https://<resource-app>.fly.dev/api/internal/ingest" \
 #     LLM_API_KEY="..." LLM_BASE_URL="..." LLM_MODEL="..." \
-#     CRE_GATEWAY_URL="..." CRE_WORKFLOW_ID="..." COORDINATOR_SIGNING_KEY="..."
+#     CRE_GATEWAY_URL="https://01.gateway.zone-a.cre.chain.link/" \
+#     CRE_WORKFLOW_ID="..." COORDINATOR_SIGNING_KEY="..." DON_TEE_ENC_PUB="..."
 # Without KEYMAP_JSON the entrypoint generates ephemeral demo keys.
