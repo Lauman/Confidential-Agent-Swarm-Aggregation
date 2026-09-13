@@ -1,0 +1,11 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "buildCommand": "pnpm build",
+  "outputDirectory": "apps/web/dist",
+  "framework": "vite",
+  "rewrites": [
+    { "source": "/api/coordinator/:path*", "destination": "https://private-signal-coord-9bd169.fly.dev/:path*" },
+    { "source": "/api/resource/:path*", "destination": "https://private-signal-resource-9bd169.fly.dev/:path*" }
+  ]
+}

@@ -1,0 +1,37 @@
+# Resource server — fly.toml
+# Deploy from repo root (Working directory = ethglobal2026/):
+#   fly apps create <resource-app> --org personal
+#   fly deploy --config fly.resource-server.toml --dockerfile Dockerfile.resource-server
+app = 'private-signal-resource-9bd169'
+primary_region = 'iad'
+
+[build]
+  dockerfile = 'Dockerfile.resource-server'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+  [[http_service.checks]]
+    grace_period = '10s'
+    interval = '30s'
+    method = 'GET'
+    path = '/health'
+    timeout = '5s'
+
+[env]
+  PORT = '8080'
+  X402_NETWORK = 'hedera:testnet'
+  X402_PRICE = '$0.01'
+  X402_FACILITATOR_URL = 'https://api.testnet.blocky402.com'
+
+# Secrets to set (never commit):
+#   fly secrets set --config fly.resource-server.toml \
+#     KEYMAP_JSON="$(cat packages/confidential-core/.dev-keys/keymap.json)" \
+#     X402_PAY_TO="0.0.xxxxx" \
+#     HEDERA_ACCOUNT_ID="0.0.xxxxx" HEDERA_PRIVATE_KEY="0x..." HEDERA_NETWORK="hedera:testnet"
+# Without X402_PAY_TO the server boots in dev mode (payments disabled).

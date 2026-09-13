@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "pnpm build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/api/coordinator/:path*", "destination": "https://private-signal-coord-9bd169.fly.dev/:path*" },
+    { "source": "/api/resource/:path*", "destination": "https://private-signal-resource-9bd169.fly.dev/:path*" }
+  ]
+}

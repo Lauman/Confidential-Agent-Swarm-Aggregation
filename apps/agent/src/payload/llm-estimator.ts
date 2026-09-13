@@ -91,6 +91,7 @@ async function callOnce(
 
   let response: Response;
   try {
+    console.log(`[LLM] POST ${config.baseUrl.replace(/\/$/, '')}/chat/completions model=${config.model} key=${config.apiKey.slice(0,6)}...`);
     response = await fetch(`${config.baseUrl.replace(/\/$/, '')}/chat/completions`, {
       method: 'POST',
       headers: {
@@ -105,15 +106,12 @@ async function callOnce(
         ],
         response_format: { type: 'json_object' },
         temperature: 0.7,
-        // max_completion_tokens only: this endpoint rejects both params set.
-        // NOTE: no provider-specific params (e.g. chat_template_kwargs) —
-        // strict endpoints 400 on unknown fields. Generous budget: reasoning
-        // traces eat tokens before the answer appears; the 90s timeout covers it.
         max_completion_tokens: 2000,
       }),
       signal: controller.signal,
     });
   } catch (error) {
+    console.error(`[LLM] fetch failed:`, error);
     throw new LLMEstimatorError(
       `LLM request failed: ${error instanceof Error ? error.message : error}`
     );
@@ -123,6 +121,7 @@ async function callOnce(
 
   if (!response.ok) {
     const text = await response.text().catch(() => '');
+    console.error(`[LLM] HTTP ${response.status}: ${text.slice(0, 300)}`);
     throw new LLMEstimatorError(`LLM request failed: ${response.status} ${text.slice(0, 200)}`);
   }
 
@@ -131,8 +130,10 @@ async function callOnce(
   } | null;
   const content = body?.choices?.[0]?.message?.content;
   if (!content) {
+    console.error(`[LLM] empty content, full body:`, JSON.stringify(body).slice(0, 300));
     throw new LLMEstimatorError('LLM response had no message content');
   }
+  console.log(`[LLM] got content: ${content.slice(0, 80)}`);
 
   let parsed: unknown;
   const attempt = tryParseBallotJson(content);

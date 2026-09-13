@@ -32,6 +32,7 @@ export function createApp(): ResourceServer {
   bindResultStore(store);
 
   const app: Express = express();
+  app.set('trust proxy', 1);
   app.use(express.json());
 
   const availabilityGate = (req: Request, res: Response, next: NextFunction): void => {
